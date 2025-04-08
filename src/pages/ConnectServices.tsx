@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,13 @@ const ConnectServices = () => {
   const { user } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "checking">("checking");
+  
+  // Check connection status on mount
+  useEffect(() => {
+    if (user) {
+      checkConnectionStatus();
+    }
+  }, [user]);
   
   // Check FitBit connection status
   const checkConnectionStatus = async () => {
