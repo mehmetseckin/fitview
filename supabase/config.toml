@@ -1,1 +1,6 @@
+
 project_id = "bmiktsasypmrivtldoyk"
+
+# Enable logs for edge functions
+[functions.config]
+db_task_logging = true
