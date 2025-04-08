@@ -1,0 +1,185 @@
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { FitbitFood, FoodLogEntry } from "@/types";
+import { useToast } from "@/components/ui/use-toast";
+import { logFood } from "@/services/fitbitApi";
+
+interface FoodLogEntryProps {
+  food: FitbitFood;
+  onClose: () => void;
+  onLog: (entry: FoodLogEntry) => void;
+}
+
+const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
+  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">("breakfast");
+  const [amount, setAmount] = useState("1");
+  const [unit, setUnit] = useState(food.servingSizeUnit);
+  const [isLogging, setIsLogging] = useState(false);
+  const { toast } = useToast();
+
+  const calculateNutrition = () => {
+    const multiplier = parseFloat(amount);
+    
+    // Basic calculation, in a real app this would be more sophisticated
+    // and account for different units
+    return {
+      calories: food.nutritionalValues.calories * multiplier,
+      carbs: food.nutritionalValues.carbs * multiplier,
+      fat: food.nutritionalValues.fat * multiplier,
+      protein: food.nutritionalValues.protein * multiplier,
+      ...(food.nutritionalValues.fiber ? { fiber: food.nutritionalValues.fiber * multiplier } : {}),
+      ...(food.nutritionalValues.sodium ? { sodium: food.nutritionalValues.sodium * multiplier } : {}),
+      ...(food.nutritionalValues.sugar ? { sugar: food.nutritionalValues.sugar * multiplier } : {})
+    };
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setIsLogging(true);
+      
+      const nutritionalValues = calculateNutrition();
+      const amountValue = parseFloat(amount);
+      
+      if (isNaN(amountValue) || amountValue <= 0) {
+        toast({
+          title: "Invalid amount",
+          description: "Please enter a valid amount greater than zero",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const entry = await logFood({
+        foodId: food.foodId,
+        name: food.name,
+        brand: food.brand,
+        mealType: mealType,
+        amount: amountValue,
+        unit: unit,
+        calories: nutritionalValues.calories,
+        nutritionalValues
+      });
+      
+      toast({
+        title: "Food logged successfully",
+        description: `Added ${food.name} to your ${mealType} log`,
+      });
+      
+      onLog(entry);
+      onClose();
+    } catch (error) {
+      console.error("Error logging food:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log food. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLogging(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-medium">{food.name}</h3>
+            <p className="text-sm text-muted-foreground">{food.brand}</p>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Amount</label>
+              <Input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                min="0"
+                step="0.1"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Unit</label>
+              <Select value={unit} onValueChange={setUnit}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {food.units.map((u) => (
+                    <SelectItem key={u} value={u}>
+                      {u}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Meal</label>
+              <Select value={mealType} onValueChange={(value: any) => setMealType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="lunch">Lunch</SelectItem>
+                  <SelectItem value="dinner">Dinner</SelectItem>
+                  <SelectItem value="snack">Snack</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="pt-2">
+            <h4 className="text-sm font-medium mb-2">Nutrition</h4>
+            <div className="grid grid-cols-4 gap-2 text-sm">
+              <div>
+                <p className="font-medium">{calculateNutrition().calories.toFixed(0)}</p>
+                <p className="text-xs text-muted-foreground">calories</p>
+              </div>
+              <div>
+                <p className="font-medium">{calculateNutrition().carbs.toFixed(1)}g</p>
+                <p className="text-xs text-muted-foreground">carbs</p>
+              </div>
+              <div>
+                <p className="font-medium">{calculateNutrition().fat.toFixed(1)}g</p>
+                <p className="text-xs text-muted-foreground">fat</p>
+              </div>
+              <div>
+                <p className="font-medium">{calculateNutrition().protein.toFixed(1)}g</p>
+                <p className="text-xs text-muted-foreground">protein</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-fitview-primary hover:bg-fitview-accent" 
+              onClick={handleSubmit}
+              disabled={isLogging}
+            >
+              {isLogging ? "Logging..." : "Log Food"}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default FoodLogEntryForm;

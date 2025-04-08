@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// FitView Custom Colors
+				fitview: {
+					primary: '#4CAF50',
+					secondary: '#81C784',
+					accent: '#2E7D32',
+					light: '#E8F5E9',
+					dark: '#1B5E20',
+					protein: '#FF5722',
+					carbs: '#2196F3',
+					fat: '#FFC107'
 				}
 			},
 			borderRadius: {

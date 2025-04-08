@@ -1,0 +1,73 @@
+
+// Fitbit API Types
+export interface FitbitFood {
+  foodId: string;
+  name: string;
+  brand: string;
+  calories: number;
+  units: string[];
+  servingSize: number;
+  servingSizeUnit: string;
+  nutritionalValues: {
+    calories: number;
+    carbs: number;
+    fat: number;
+    protein: number;
+    fiber?: number;
+    sodium?: number;
+    sugar?: number;
+  };
+}
+
+export interface FoodSearchResult {
+  foods: FitbitFood[];
+  pagination?: {
+    next: string;
+    previous: string;
+    offset: number;
+    limit: number;
+    total: number;
+  };
+}
+
+export interface FoodLogEntry {
+  id: string;
+  foodId: string;
+  name: string;
+  brand: string;
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  amount: number;
+  unit: string;
+  calories: number;
+  nutritionalValues: {
+    calories: number;
+    carbs: number;
+    fat: number;
+    protein: number;
+    fiber?: number;
+    sodium?: number;
+    sugar?: number;
+  };
+  loggedAt: Date;
+}
+
+export interface NutritionSummary {
+  calories: {
+    consumed: number;
+    goal: number;
+  };
+  macros: {
+    carbs: { consumed: number; goal: number };
+    fat: { consumed: number; goal: number };
+    protein: { consumed: number; goal: number };
+  };
+}
+
+export interface NutritionGoals {
+  calories: number;
+  macros: {
+    carbs: number;
+    fat: number;
+    protein: number;
+  };
+}

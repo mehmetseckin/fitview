@@ -1,0 +1,178 @@
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { NutritionGoals } from "@/types";
+import { useToast } from "@/components/ui/use-toast";
+
+interface DailyGoalsProps {
+  goals: NutritionGoals;
+  onSave: (goals: NutritionGoals) => void;
+}
+
+const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedGoals, setEditedGoals] = useState<NutritionGoals>(goals);
+  const { toast } = useToast();
+
+  const handleSave = () => {
+    // Validate the inputs
+    if (
+      editedGoals.calories <= 0 ||
+      editedGoals.macros.carbs <= 0 ||
+      editedGoals.macros.fat <= 0 ||
+      editedGoals.macros.protein <= 0
+    ) {
+      toast({
+        title: "Invalid values",
+        description: "All values must be greater than zero",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    onSave(editedGoals);
+    setIsEditing(false);
+    toast({
+      title: "Goals updated",
+      description: "Your nutrition goals have been updated",
+    });
+  };
+
+  const handleCancel = () => {
+    setEditedGoals(goals);
+    setIsEditing(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-lg">Daily Nutrition Goals</CardTitle>
+        {!isEditing ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="bg-fitview-primary hover:bg-fitview-accent"
+              onClick={handleSave}
+            >
+              Save
+            </Button>
+          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium block mb-1">
+                Daily Calories
+              </label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={editedGoals.calories}
+                  onChange={(e) =>
+                    setEditedGoals({
+                      ...editedGoals,
+                      calories: parseInt(e.target.value) || 0,
+                    })
+                  }
+                  min="0"
+                />
+              ) : (
+                <p>{goals.calories} cal</p>
+              )}
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <h4 className="text-sm font-medium mb-3">Macronutrients</h4>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm block mb-1">Carbohydrates</label>
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    value={editedGoals.macros.carbs}
+                    onChange={(e) =>
+                      setEditedGoals({
+                        ...editedGoals,
+                        macros: {
+                          ...editedGoals.macros,
+                          carbs: parseInt(e.target.value) || 0,
+                        },
+                      })
+                    }
+                    min="0"
+                  />
+                ) : (
+                  <p>{goals.macros.carbs}g</p>
+                )}
+              </div>
+              <div>
+                <label className="text-sm block mb-1">Fat</label>
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    value={editedGoals.macros.fat}
+                    onChange={(e) =>
+                      setEditedGoals({
+                        ...editedGoals,
+                        macros: {
+                          ...editedGoals.macros,
+                          fat: parseInt(e.target.value) || 0,
+                        },
+                      })
+                    }
+                    min="0"
+                  />
+                ) : (
+                  <p>{goals.macros.fat}g</p>
+                )}
+              </div>
+              <div>
+                <label className="text-sm block mb-1">Protein</label>
+                {isEditing ? (
+                  <Input
+                    type="number"
+                    value={editedGoals.macros.protein}
+                    onChange={(e) =>
+                      setEditedGoals({
+                        ...editedGoals,
+                        macros: {
+                          ...editedGoals.macros,
+                          protein: parseInt(e.target.value) || 0,
+                        },
+                      })
+                    }
+                    min="0"
+                  />
+                ) : (
+                  <p>{goals.macros.protein}g</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default DailyGoals;
