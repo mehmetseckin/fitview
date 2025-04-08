@@ -7,3 +7,4 @@ db_task_logging = true
 
 [functions.fitbit-auth]
 verify_jwt = true
+
