@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Form,
   FormControl,
@@ -18,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -33,6 +35,7 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { signInWithGoogle } = useAuth();
   
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -72,7 +75,7 @@ const Auth = () => {
         description: "Welcome back to FitView!",
       });
       
-      navigate("/");
+      navigate("/connect-services");
     } catch (error) {
       toast({
         title: "An error occurred",
@@ -106,7 +109,7 @@ const Auth = () => {
         description: "Welcome to FitView! Please check your email to verify your account.",
       });
       
-      navigate("/");
+      navigate("/connect-services");
     } catch (error) {
       toast({
         title: "An error occurred",
@@ -115,6 +118,18 @@ const Auth = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      toast({
+        title: "Google sign in failed",
+        description: "Please try again later",
+        variant: "destructive",
+      });
     }
   };
 
@@ -133,7 +148,24 @@ const Auth = () => {
             <CardTitle>Welcome to FitView</CardTitle>
             <CardDescription>Sign in to your account or create a new one</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleGoogleSignIn}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512" className="h-4 w-4">
+                <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+              </svg>
+              Continue with Google
+            </Button>
+            
+            <div className="flex items-center gap-4">
+              <Separator className="flex-1" />
+              <span className="text-xs text-gray-500">OR</span>
+              <Separator className="flex-1" />
+            </div>
+            
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
