@@ -6,6 +6,10 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
+    https: {
+      key: path.resolve(__dirname, "localhost-key.pem"),
+      cert: path.resolve(__dirname, "localhost.pem")
+    },
     host: "::",
     port: 8080,
   },
