@@ -53,9 +53,8 @@ const ConnectServices = () => {
     
     try {
       const { data, error } = await supabase.functions.invoke(
-        "fitbit-auth", {
+        "fitbit-auth/authorize", {
           body: {
-            path: "authorize",
             userId: user.id
           }
         }
