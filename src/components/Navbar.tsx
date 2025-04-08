@@ -37,6 +37,12 @@ const Navbar = () => {
             >
               Goals
             </Link>
+            <Link
+              to="/connect-services"
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
+              Connect Services
+            </Link>
           </nav>
         )}
         

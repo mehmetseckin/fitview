@@ -9,6 +9,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import FitbitCallback from "./pages/FitbitCallback";
+import ConnectServices from "./pages/ConnectServices";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,18 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Index />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/fitbit-callback" 
+              element={<FitbitCallback />} 
+            />
+            <Route 
+              path="/connect-services" 
+              element={
+                <ProtectedRoute>
+                  <ConnectServices />
                 </ProtectedRoute>
               } 
             />
