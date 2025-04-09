@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RefreshCcw } from "lucide-react";
+import fitbitAppIcon from '@/assets/images/fitbit-app-icon.png';
 
 const ConnectServices = () => {
   const { user } = useAuth();
@@ -111,7 +112,7 @@ const ConnectServices = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <img 
-                  src="https://www.fitbit.com/images/logo-header.png" 
+                  src={fitbitAppIcon} 
                   alt="Fitbit Logo" 
                   className="h-6 mr-2" 
                 />

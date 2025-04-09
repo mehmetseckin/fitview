@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import fitviewLogo from "@/assets/images/fitview-symbol.png";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -11,7 +12,7 @@ const Navbar = () => {
     <div className="border-b">
       <div className="flex h-16 items-center px-4 container">
         <div className="flex items-center gap-2">
-          <img src="" alt="" className="h-8 w-8" />
+          <img src={fitviewLogo} alt="" className="h-8 w-8" />
           <Link to="/" className="font-bold text-xl text-fitview-primary">
             FitView
           </Link>
