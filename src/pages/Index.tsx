@@ -157,7 +157,7 @@ const Index = () => {
                               <div>
                                 <h3 className="font-medium">{entry.name}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                  {entry.amount} {entry.unit} • {getFitbitMealName(entry.mealTypeId)}
+                                  {entry.amount} {entry.amount !== 1 ? entry.unit.plural : entry.unit.name} • {getFitbitMealName(entry.mealTypeId)}
                                 </p>
                               </div>
                               <div className="text-right">
@@ -197,7 +197,7 @@ const Index = () => {
                                   <div>
                                     <h3 className="font-medium">{entry.name}</h3>
                                     <p className="text-sm text-muted-foreground">
-                                      {entry.amount} {entry.unit}
+                                      {entry.amount} {entry.amount !== 1 ? entry.unit.plural : entry.unit.name} • {getFitbitMealName(entry.mealTypeId)}
                                     </p>
                                   </div>
                                   <div className="text-right">

@@ -130,7 +130,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Meal</label>
-              <Select value={mealType} onValueChange={(value: any) => setMealType(value)}>
+              <Select value={mealType.toString()} onValueChange={(value: any) => setMealType(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

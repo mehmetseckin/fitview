@@ -90,13 +90,7 @@ export class FitbitApiService {
 
     return data.foods.map((entry: any) => ({
       id: entry.logId,
-      foodId: entry.foodId,
-      name: entry.foodName,
-      brand: entry.brand,
-      mealTypeId: entry.mealTypeId,
-      amount: entry.amount,
-      unit: entry.unit,
-      calories: entry.calories,
+      ...entry.loggedFood,
       nutritionalValues: entry.nutritionalValues,
       loggedAt: new Date(entry.logDate),
     }));

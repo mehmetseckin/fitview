@@ -37,7 +37,11 @@ export interface FoodLogEntry {
   brand: string;
   mealTypeId: MealType;
   amount: number;
-  unit: string;
+  unit: {
+    id: string;
+    name: string;
+    plural: string;
+  };
   calories: number;
   nutritionalValues: {
     calories: number;
