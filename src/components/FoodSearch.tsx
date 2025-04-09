@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FitbitFood } from "@/types";
-import { searchFoods } from "@/services/fitbitApi";
 import { SearchIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useFitbitApi } from "@/hooks/useFitbitApi";
 
 interface FoodSearchProps {
   onFoodSelect: (food: FitbitFood) => void;
@@ -17,6 +17,7 @@ const FoodSearch = ({ onFoodSelect }: FoodSearchProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<FitbitFood[]>([]);
   const { toast } = useToast();
+  const { searchFoods } = useFitbitApi();
 
   const handleSearch = async () => {
     if (!query.trim()) return;

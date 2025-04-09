@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +8,10 @@ import FoodSearch from "@/components/FoodSearch";
 import NutritionSummary from "@/components/NutritionSummary";
 import FoodLogEntryForm from "@/components/FoodLogEntry";
 import DailyGoals from "@/components/DailyGoals";
-import { FitbitFood, FoodLogEntry, NutritionGoals } from "@/types";
-import { getFoodLog, getNutritionSummary } from "@/services/fitbitApi";
+import { FitbitFood, FoodLogEntry, MealType, NutritionGoals } from "@/types";
 import { format } from "date-fns";
+import { useFitbitApi } from "@/hooks/useFitbitApi";
+import { getFitbitMealName, getFitbitMealType } from "@/lib/utils";
 
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -32,6 +32,8 @@ const Index = () => {
       protein: 150
     }
   });
+
+  const { getFoodLog, getNutritionSummary } = useFitbitApi();
 
   const fetchData = async () => {
     try {
@@ -65,10 +67,6 @@ const Index = () => {
     });
     
     setIsSearchOpen(false);
-  };
-
-  const formatMealType = (type: string) => {
-    return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   return (
@@ -143,9 +141,11 @@ const Index = () => {
                   <TabsList className="mb-4">
                     <TabsTrigger value="all">All</TabsTrigger>
                     <TabsTrigger value="breakfast">Breakfast</TabsTrigger>
+                    <TabsTrigger value="morning snack">Morning Snack</TabsTrigger>
                     <TabsTrigger value="lunch">Lunch</TabsTrigger>
+                    <TabsTrigger value="afternoon snack">Afternoon Snack</TabsTrigger>
                     <TabsTrigger value="dinner">Dinner</TabsTrigger>
-                    <TabsTrigger value="snack">Snack</TabsTrigger>
+                    <TabsTrigger value="evening snack">Evening Snack</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="all" className="space-y-4">
@@ -157,7 +157,7 @@ const Index = () => {
                               <div>
                                 <h3 className="font-medium">{entry.name}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                  {entry.amount} {entry.unit} • {formatMealType(entry.mealType)}
+                                  {entry.amount} {entry.unit} • {getFitbitMealName(entry.mealTypeId)}
                                 </p>
                               </div>
                               <div className="text-right">
@@ -185,11 +185,11 @@ const Index = () => {
                   </TabsContent>
                   
                   {/* Similar TabsContent for breakfast, lunch, dinner, snack */}
-                  {["breakfast", "lunch", "dinner", "snack"].map((mealType) => (
+                  {["breakfast", "morning snack", "lunch", "afternoon snack", "dinner", "evening snack"].map((mealType) => (
                     <TabsContent key={mealType} value={mealType} className="space-y-4">
-                      {foodLog.filter(entry => entry.mealType === mealType).length > 0 ? (
+                      {foodLog.filter(entry => entry.mealTypeId === getFitbitMealType(mealType)).length > 0 ? (
                         foodLog
-                          .filter(entry => entry.mealType === mealType)
+                          .filter(entry => entry.mealTypeId === getFitbitMealType(mealType))
                           .map((entry) => (
                             <Card key={entry.id}>
                               <CardContent className="p-4">

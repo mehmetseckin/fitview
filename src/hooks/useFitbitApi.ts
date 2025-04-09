@@ -1,0 +1,32 @@
+import { useMemo } from "react";
+import { FitbitApiService } from "@/services/fitbitApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { FoodLogEntry } from "@/types";
+
+export const useFitbitApi = () => {
+  const { user } = useAuth();
+
+  const fitbitApi = useMemo(() => new FitbitApiService(user), [user]);
+
+  const getFoodLog = async (date?: Date) => {
+    return await fitbitApi.getFoodLog(date);
+  };
+
+  const getNutritionSummary = async (date?: Date) => {
+    return await fitbitApi.getNutritionSummary(date);
+  };
+
+  const searchFoods = async (query: string) => {   
+    return await fitbitApi.searchFoods(query);
+  };
+
+  const getFoodDetails = async (foodId: string) => {
+    return await fitbitApi.getFoodDetails(foodId);
+  };
+
+  const logFood = async (foodEntry: Omit<FoodLogEntry, "id" | "loggedAt">) => {
+    return await fitbitApi.logFood(foodEntry);
+  };
+
+  return { getFoodLog, getNutritionSummary, searchFoods, getFoodDetails, logFood};
+};

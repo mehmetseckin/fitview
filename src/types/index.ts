@@ -35,7 +35,7 @@ export interface FoodLogEntry {
   foodId: string;
   name: string;
   brand: string;
-  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  mealTypeId: MealType;
   amount: number;
   unit: string;
   calories: number;
@@ -70,4 +70,14 @@ export interface NutritionGoals {
     fat: number;
     protein: number;
   };
+}
+
+export enum MealType {
+  breakfast = 1,
+  morningSnack = 2,
+  lunch = 3,
+  afternoonSnack = 4,
+  dinner = 5,
+  eveningSnack = 6,
+  unknown = 7
 }

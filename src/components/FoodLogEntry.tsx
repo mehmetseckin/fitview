@@ -10,9 +10,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { FitbitFood, FoodLogEntry } from "@/types";
+import { FitbitFood, FoodLogEntry, MealType } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
-import { logFood } from "@/services/fitbitApi";
+import { useFitbitApi } from "@/hooks/useFitbitApi";
+import { getFitbitMealName } from "@/lib/utils";
 
 interface FoodLogEntryProps {
   food: FitbitFood;
@@ -21,11 +22,12 @@ interface FoodLogEntryProps {
 }
 
 const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
-  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">("breakfast");
+  const [mealType, setMealType] = useState<MealType>(MealType.breakfast);
   const [amount, setAmount] = useState("1");
   const [unit, setUnit] = useState(food.servingSizeUnit);
   const [isLogging, setIsLogging] = useState(false);
   const { toast } = useToast();
+  const { logFood } = useFitbitApi();
 
   const calculateNutrition = () => {
     const multiplier = parseFloat(amount);
@@ -63,7 +65,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
         foodId: food.foodId,
         name: food.name,
         brand: food.brand,
-        mealType: mealType,
+        mealTypeId: mealType,
         amount: amountValue,
         unit: unit,
         calories: nutritionalValues.calories,
@@ -72,7 +74,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
       
       toast({
         title: "Food logged successfully",
-        description: `Added ${food.name} to your ${mealType} log`,
+        description: `Added ${food.name} to your ${getFitbitMealName(mealType)} log`,
       });
       
       onLog(entry);
@@ -133,10 +135,12 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="breakfast">Breakfast</SelectItem>
-                  <SelectItem value="lunch">Lunch</SelectItem>
-                  <SelectItem value="dinner">Dinner</SelectItem>
-                  <SelectItem value="snack">Snack</SelectItem>
+                  <SelectItem value={MealType.breakfast.toString()}>{getFitbitMealName(MealType.breakfast)}</SelectItem>
+                  <SelectItem value={MealType.morningSnack.toString()}>{getFitbitMealName(MealType.morningSnack)}</SelectItem>
+                  <SelectItem value={MealType.lunch.toString()}>{getFitbitMealName(MealType.lunch)}</SelectItem>
+                  <SelectItem value={MealType.afternoonSnack.toString()}>{getFitbitMealName(MealType.afternoonSnack)}</SelectItem>
+                  <SelectItem value={MealType.dinner.toString()}>{getFitbitMealName(MealType.dinner)}</SelectItem>
+                  <SelectItem value={MealType.eveningSnack.toString()}>{getFitbitMealName(MealType.eveningSnack)}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
