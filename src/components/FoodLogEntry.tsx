@@ -24,7 +24,7 @@ interface FoodLogEntryProps {
 const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
   const [mealType, setMealType] = useState<MealType>(MealType.breakfast);
   const [amount, setAmount] = useState("1");
-  const [unit, setUnit] = useState(food.servingSizeUnit);
+  const [unit, setUnit] = useState(food.defaultUnit);
   const [isLogging, setIsLogging] = useState(false);
   const { toast } = useToast();
   const { logFood } = useFitbitApi();
@@ -114,7 +114,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Unit</label>
-              <Select value={unit} onValueChange={setUnit}>
+              <Select value={unit.id} onValueChange={(value) => setUnit(food.defaultUnit)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

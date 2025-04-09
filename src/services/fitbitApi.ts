@@ -34,17 +34,10 @@ export class FitbitApiService {
         brand: food.brand,
         calories: food.calories,
         units: food.units,
-        servingSize: food.defaultServingSize,
-        servingSizeUnit: food.defaultUnit,
+        defaultServingSize: food.defaultServingSize,
+        defaultUnit: food.defaultUnit,
         nutritionalValues: food.nutritionalValues,
-      })),
-      pagination: {
-        next: data.pagination.next,
-        previous: data.pagination.previous,
-        offset: data.pagination.offset,
-        limit: data.pagination.limit,
-        total: data.pagination.total,
-      },
+      }))
     };
   }
 
@@ -67,7 +60,7 @@ export class FitbitApiService {
       foodId: foodEntry.foodId,
       mealTypeId: foodEntry.mealTypeId,
       amount: foodEntry.amount,
-      unitId: foodEntry.unit,
+      unitId: foodEntry.unit.id,
     });
 
     return {

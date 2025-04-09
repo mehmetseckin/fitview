@@ -6,8 +6,8 @@ export interface FitbitFood {
   brand: string;
   calories: number;
   units: string[];
-  servingSize: number;
-  servingSizeUnit: string;
+  defaultServingSize: number;
+  defaultUnit: FitbitFoodUnit;
   nutritionalValues: {
     calories: number;
     carbs: number;
@@ -17,6 +17,12 @@ export interface FitbitFood {
     sodium?: number;
     sugar?: number;
   };
+}
+
+export interface FitbitFoodUnit {
+  id: string;
+  name: string;
+  plural: string;
 }
 
 export interface FoodSearchResult {
@@ -37,11 +43,7 @@ export interface FoodLogEntry {
   brand: string;
   mealTypeId: MealType;
   amount: number;
-  unit: {
-    id: string;
-    name: string;
-    plural: string;
-  };
+  unit: FitbitFoodUnit;
   calories: number;
   nutritionalValues: {
     calories: number;

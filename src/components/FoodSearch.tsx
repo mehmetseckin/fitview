@@ -79,9 +79,9 @@ const FoodSearch = ({ onFoodSelect }: FoodSearchProps) => {
                     <p className="text-sm text-muted-foreground">{food.brand}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{food.nutritionalValues.calories} cal</p>
+                    <p className="font-medium">{food.calories} cal</p>
                     <p className="text-sm text-muted-foreground">
-                      {food.servingSize} {food.servingSizeUnit}
+                      {food.defaultServingSize} {food.defaultServingSize !== 1 ? food.defaultUnit.plural : food.defaultUnit.name}
                     </p>
                   </div>
                 </div>
