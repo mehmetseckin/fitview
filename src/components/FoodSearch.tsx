@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,10 +11,13 @@ interface FoodSearchProps {
   onFoodSelect: (food: FitbitFood) => void;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 const FoodSearch = ({ onFoodSelect }: FoodSearchProps) => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<FitbitFood[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const { searchFoods } = useFitbitApi();
 
@@ -51,6 +53,25 @@ const FoodSearch = ({ onFoodSelect }: FoodSearchProps) => {
     }
   };
 
+  const paginatedResults = results.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="flex mb-4">
@@ -70,24 +91,37 @@ const FoodSearch = ({ onFoodSelect }: FoodSearchProps) => {
       {results.length > 0 && (
         <div className="mt-4 space-y-2">
           <h3 className="text-sm font-medium">Search Results</h3>
-          {results.map((food) => (
-            <Card key={food.foodId} className="hover:bg-muted cursor-pointer" onClick={() => onFoodSelect(food)}>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="font-medium">{food.name}</h4>
-                    <p className="text-sm text-muted-foreground">{food.brand}</p>
+          <div className="max-h-[60vh] overflow-y-auto p-2 border border-gray-200 rounded-md">
+            {paginatedResults.map((food) => (
+              <Card key={food.foodId} className="hover:bg-muted cursor-pointer" onClick={() => onFoodSelect(food)}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-medium">{food.name}</h4>
+                      <p className="text-sm text-muted-foreground">{food.brand}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{food.calories} cal</p>
+                      <p className="text-sm text-muted-foreground">
+                        {food.defaultServingSize} {food.defaultServingSize !== 1 ? food.defaultUnit.plural : food.defaultUnit.name}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">{food.calories} cal</p>
-                    <p className="text-sm text-muted-foreground">
-                      {food.defaultServingSize} {food.defaultServingSize !== 1 ? food.defaultUnit.plural : food.defaultUnit.name}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="flex justify-between items-center mt-4">
+            <Button onClick={handlePreviousPage} disabled={currentPage === 1}>
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
+              Next
+            </Button>
+          </div>
         </div>
       )}
     </div>
