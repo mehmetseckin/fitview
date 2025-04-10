@@ -1,4 +1,4 @@
-import { FitbitFood, FoodSearchResult, FoodLogEntry } from "@/types";
+import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export class FitbitApiService {
@@ -49,8 +49,8 @@ export class FitbitApiService {
       brand: data.brand,
       calories: data.calories,
       units: data.units,
-      servingSize: data.defaultServingSize,
-      servingSizeUnit: data.defaultUnit,
+      defaultServingSize: data.defaultServingSize,
+      defaultUnit: data.defaultUnit,
       nutritionalValues: data.nutritionalValues,
     };
   }
@@ -113,5 +113,10 @@ export class FitbitApiService {
         totalProtein: 0,
       }
     );
+  }
+
+  public async getFoodUnits(): Promise<FitbitFoodUnit[]> {
+    const data = await this.fitbitApiRequest(`/foods/units.json`);
+    return data;
   }
 }

@@ -10,20 +10,16 @@ import FoodLogEntryForm from "@/components/FoodLogEntry";
 import DailyGoals from "@/components/DailyGoals";
 import { FitbitFood, FoodLogEntry, MealType, NutritionGoals } from "@/types";
 import { format } from "date-fns";
-import { useFitbitApi } from "@/hooks/useFitbitApi";
 import { getFitbitMealName, getFitbitMealType } from "@/lib/utils";
+import { useFitbit } from "@/contexts/FitbitContext";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState<FitbitFood | null>(null);
-  const [foodLog, setFoodLog] = useState<FoodLogEntry[]>([]);
-  const [summaryData, setSummaryData] = useState({
-    totalCalories: 0,
-    totalCarbs: 0, 
-    totalFat: 0,
-    totalProtein: 0
-  });
   
+  const { foodLog, units, addFoodLogEntry } = useFitbit();
+
   const [nutritionGoals, setNutritionGoals] = useState<NutritionGoals>({
     calories: 2000,
     macros: {
@@ -33,30 +29,19 @@ const Index = () => {
     }
   });
 
-  const { getFoodLog, getNutritionSummary } = useFitbitApi();
-
-  const fetchData = async () => {
-    try {
-      const log = await getFoodLog();
-      setFoodLog(log);
-      
-      const summary = await getNutritionSummary();
-      setSummaryData(summary);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [summaryData, setSummaryData] = useState({
+    totalCalories: 0,
+    totalCarbs: 0, 
+    totalFat: 0,
+    totalProtein: 0
+  });
 
   const handleFoodSelect = (food: FitbitFood) => {
     setSelectedFood(food);
   };
 
   const handleFoodLog = (entry: FoodLogEntry) => {
-    setFoodLog([entry, ...foodLog]);
+    addFoodLogEntry(entry);
     
     // Update summary data
     setSummaryData({
@@ -123,7 +108,8 @@ const Index = () => {
                   <DialogContent className="sm:max-w-[600px]">
                     {selectedFood ? (
                       <FoodLogEntryForm 
-                        food={selectedFood} 
+                        food={selectedFood}
+                        units={units}
                         onClose={() => setSelectedFood(null)} 
                         onLog={handleFoodLog}
                       />

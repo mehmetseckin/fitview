@@ -10,18 +10,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { FitbitFood, FoodLogEntry, MealType } from "@/types";
+import { FitbitFood, FitbitFoodUnit, FoodLogEntry, MealType } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 import { useFitbitApi } from "@/hooks/useFitbitApi";
 import { getFitbitMealName } from "@/lib/utils";
 
 interface FoodLogEntryProps {
   food: FitbitFood;
+  units: FitbitFoodUnit[];
   onClose: () => void;
   onLog: (entry: FoodLogEntry) => void;
 }
 
-const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
+const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) => {
   const [mealType, setMealType] = useState<MealType>(MealType.breakfast);
   const [amount, setAmount] = useState("1");
   const [unit, setUnit] = useState(food.defaultUnit);
@@ -29,27 +30,10 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
   const { toast } = useToast();
   const { logFood } = useFitbitApi();
 
-  const calculateNutrition = () => {
-    const multiplier = parseFloat(amount);
-    
-    // Basic calculation, in a real app this would be more sophisticated
-    // and account for different units
-    return {
-      calories: food.nutritionalValues.calories * multiplier,
-      carbs: food.nutritionalValues.carbs * multiplier,
-      fat: food.nutritionalValues.fat * multiplier,
-      protein: food.nutritionalValues.protein * multiplier,
-      ...(food.nutritionalValues.fiber ? { fiber: food.nutritionalValues.fiber * multiplier } : {}),
-      ...(food.nutritionalValues.sodium ? { sodium: food.nutritionalValues.sodium * multiplier } : {}),
-      ...(food.nutritionalValues.sugar ? { sugar: food.nutritionalValues.sugar * multiplier } : {})
-    };
-  };
-
   const handleSubmit = async () => {
     try {
       setIsLogging(true);
       
-      const nutritionalValues = calculateNutrition();
       const amountValue = parseFloat(amount);
       
       if (isNaN(amountValue) || amountValue <= 0) {
@@ -68,8 +52,8 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
         mealTypeId: mealType,
         amount: amountValue,
         unit: unit,
-        calories: nutritionalValues.calories,
-        nutritionalValues
+        calories: food.calories,
+        nutritionalValues: food.nutritionalValues,
       });
       
       toast({
@@ -114,16 +98,19 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Unit</label>
-              <Select value={unit.id} onValueChange={(value) => setUnit(food.defaultUnit)}>
+              <Select value={unit.id} onValueChange={(value) => setUnit(units.find((u) => u.id === value))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {food.units.map((u) => (
-                    <SelectItem key={u} value={u}>
-                      {u}
-                    </SelectItem>
-                  ))}
+                  {food.units.map((unitId) => {
+                    const u = units.find((_) => _.id === unitId);
+                    return !!u && (
+                    <SelectItem key={u.id} value={u.id}>
+                        {amount !== "1" ? u.plural : u.name}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -150,19 +137,19 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
             <h4 className="text-sm font-medium mb-2">Nutrition</h4>
             <div className="grid grid-cols-4 gap-2 text-sm">
               <div>
-                <p className="font-medium">{calculateNutrition().calories.toFixed(0)}</p>
+                <p className="font-medium">{food.nutritionalValues?.calories.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground">calories</p>
               </div>
               <div>
-                <p className="font-medium">{calculateNutrition().carbs.toFixed(1)}g</p>
+                <p className="font-medium">{food.nutritionalValues?.carbs.toFixed(1)}g</p>
                 <p className="text-xs text-muted-foreground">carbs</p>
               </div>
               <div>
-                <p className="font-medium">{calculateNutrition().fat.toFixed(1)}g</p>
+                <p className="font-medium">{food.nutritionalValues?.fat.toFixed(1)}g</p>
                 <p className="text-xs text-muted-foreground">fat</p>
               </div>
               <div>
-                <p className="font-medium">{calculateNutrition().protein.toFixed(1)}g</p>
+                <p className="font-medium">{food.nutritionalValues?.protein.toFixed(1)}g</p>
                 <p className="text-xs text-muted-foreground">protein</p>
               </div>
             </div>

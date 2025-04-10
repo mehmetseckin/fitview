@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,15 +16,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = useRef(true);
+  const hasInitialised = useRef(false);
 
   useEffect(() => {
+
+    if(hasInitialised.current) {
+      return
+    }
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setIsLoading(false);
+        isLoading.current = false;
       }
     );
 
@@ -32,9 +38,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setIsLoading(false);
+      isLoading.current = false;
     });
 
+    hasInitialised.current = true;
+    
     return () => subscription.unsubscribe();
   }, []);
 
@@ -52,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, signOut, signInWithGoogle }}>
+    <AuthContext.Provider value={{ user, session, isLoading: isLoading.current, signOut, signInWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

@@ -27,13 +27,6 @@ export interface FitbitFoodUnit {
 
 export interface FoodSearchResult {
   foods: FitbitFood[];
-  pagination?: {
-    next: string;
-    previous: string;
-    offset: number;
-    limit: number;
-    total: number;
-  };
 }
 
 export interface FoodLogEntry {
