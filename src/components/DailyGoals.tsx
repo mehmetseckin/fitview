@@ -109,7 +109,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                 {isEditing ? (
                   <Input
                     type="number"
-                    value={editedGoals.macros.carbs}
+                    value={editedGoals.macros?.carbs || 0}
                     onChange={(e) =>
                       setEditedGoals({
                         ...editedGoals,
@@ -122,7 +122,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                     min="0"
                   />
                 ) : (
-                  <p>{goals.macros.carbs}g</p>
+                  <p>{goals.macros?.carbs || 0}g</p>
                 )}
               </div>
               <div>
@@ -143,7 +143,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                     min="0"
                   />
                 ) : (
-                  <p>{goals.macros.fat}g</p>
+                  <p>{goals.macros?.fat || 0}g</p>
                 )}
               </div>
               <div>
@@ -164,7 +164,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                     min="0"
                   />
                 ) : (
-                  <p>{goals.macros.protein}g</p>
+                  <p>{goals.macros?.protein || 0}g</p>
                 )}
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit } from "@/types";
+import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit, FoodLog, FitbitNutritionSummary } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export class FitbitApiService {
@@ -26,97 +26,36 @@ export class FitbitApiService {
   }
 
   public async searchFoods(query: string): Promise<FoodSearchResult> {
-    const data = await this.fitbitApiRequest(`/foods/search.json?query=${encodeURIComponent(query)}`);
-    return {
-      foods: data.foods.map((food: any) => ({
-        foodId: food.foodId,
-        name: food.name,
-        brand: food.brand,
-        calories: food.calories,
-        units: food.units,
-        defaultServingSize: food.defaultServingSize,
-        defaultUnit: food.defaultUnit,
-        nutritionalValues: food.nutritionalValues,
-      }))
-    };
+    return await this.fitbitApiRequest(`/foods/search.json?query=${encodeURIComponent(query)}`);
   }
 
   public async getFoodDetails(foodId: string): Promise<FitbitFood | null> {
-    const data = await this.fitbitApiRequest(`/foods/${foodId}.json`);
-    return {
-      foodId: data.foodId,
-      name: data.name,
-      brand: data.brand,
-      calories: data.calories,
-      units: data.units,
-      defaultServingSize: data.defaultServingSize,
-      defaultUnit: data.defaultUnit,
-      nutritionalValues: data.nutritionalValues,
-    };
+    return await this.fitbitApiRequest(`/foods/${foodId}.json`);
   }
 
-  public async logFood(foodEntry: Omit<FoodLogEntry, "id" | "loggedAt">): Promise<FoodLogEntry> {
+  public async logFood(foodEntry: Omit<FoodLogEntry, "logId" | "logDate">): Promise<FoodLogEntry> {
     const data = await this.fitbitApiRequest(`/user/-/foods/log.json`, "POST", {
-      foodId: foodEntry.foodId,
-      mealTypeId: foodEntry.mealTypeId,
-      amount: foodEntry.amount,
-      unitId: foodEntry.unit.id,
+      foodId: foodEntry.loggedFood.foodId,
+      mealTypeId: foodEntry.loggedFood.mealTypeId,
+      amount: foodEntry.loggedFood.amount,
+      unitId: foodEntry.loggedFood.unit.id,
     });
 
-    return {
-      id: data.logId,
-      foodId: data.foodId,
-      name: data.foodName,
-      brand: data.brand,
-      mealTypeId: data.mealTypeId,
-      amount: data.amount,
-      unit: data.unit,
-      calories: data.calories,
-      nutritionalValues: data.nutritionalValues,
-      loggedAt: new Date(data.logDate),
-    };
+    return data;
   }
 
-  public async getFoodLog(date?: Date): Promise<FoodLogEntry[]> {
+  public async getFoodLog(date?: Date): Promise<FoodLog> {
     const dateString = (date ? date : new Date()).toISOString().split("T")[0];
     const data = await this.fitbitApiRequest(`/user/-/foods/log/date/${dateString}.json`);
-
-    return data.foods.map((entry: any) => ({
-      id: entry.logId,
-      ...entry.loggedFood,
-      nutritionalValues: entry.nutritionalValues,
-      loggedAt: new Date(entry.logDate),
-    }));
+    return data;
   }
 
-  public async getNutritionSummary(date?: Date): Promise<{
-    totalCalories: number;
-    totalCarbs: number;
-    totalFat: number;
-    totalProtein: number;
-  }> {
+  public async getNutritionSummary(date?: Date): Promise<FitbitNutritionSummary> {
     const log = await this.getFoodLog(date);
-
-    return log.reduce(
-      (acc, entry) => {
-        return {
-          totalCalories: acc.totalCalories + entry.nutritionalValues.calories,
-          totalCarbs: acc.totalCarbs + entry.nutritionalValues.carbs,
-          totalFat: acc.totalFat + entry.nutritionalValues.fat,
-          totalProtein: acc.totalProtein + entry.nutritionalValues.protein,
-        };
-      },
-      {
-        totalCalories: 0,
-        totalCarbs: 0,
-        totalFat: 0,
-        totalProtein: 0,
-      }
-    );
+    return log.summary;
   }
 
   public async getFoodUnits(): Promise<FitbitFoodUnit[]> {
-    const data = await this.fitbitApiRequest(`/foods/units.json`);
-    return data;
+    return await this.fitbitApiRequest(`/foods/units.json`);
   }
 }

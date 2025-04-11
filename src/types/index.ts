@@ -29,16 +29,18 @@ export interface FoodSearchResult {
   foods: FitbitFood[];
 }
 
+export interface FoodLog {
+  foods: FoodLogEntry[];
+  summary: FitbitNutritionSummary;
+  goals: FitbitNutritionGoals;
+}
+
 export interface FoodLogEntry {
-  id: string;
-  foodId: string;
-  name: string;
-  brand: string;
-  mealTypeId: MealType;
-  amount: number;
-  unit: FitbitFoodUnit;
-  calories: number;
-  nutritionalValues: {
+  isFavorite: boolean;
+  logId: string;
+  logDate: Date;
+  loggedFood: LoggedFood;
+  nutritionalValues?: {
     calories: number;
     carbs: number;
     fat: number;
@@ -47,24 +49,34 @@ export interface FoodLogEntry {
     sodium?: number;
     sugar?: number;
   };
-  loggedAt: Date;
 }
 
-export interface NutritionSummary {
-  calories: {
-    consumed: number;
-    goal: number;
-  };
-  macros: {
-    carbs: { consumed: number; goal: number };
-    fat: { consumed: number; goal: number };
-    protein: { consumed: number; goal: number };
-  };
-}
-
-export interface NutritionGoals {
+export interface LoggedFood {
+  foodId: string;
+  name: string;
+  brand: string;
+  mealTypeId: MealType;
+  amount: number;
+  unit: FitbitFoodUnit;
   calories: number;
-  macros: {
+  accesLevel: "PUBLIC" | "PRIVATE";
+  locale: string;
+}
+
+export interface FitbitNutritionSummary {
+  calories: number;
+  carbs: number;
+  fat: number;
+  protein: number;
+  fiber?: number;
+  sodium?: number;
+  sugar?: number;
+  water: number;
+}
+
+export interface FitbitNutritionGoals {
+  calories: number;
+  macros?: {
     carbs: number;
     fat: number;
     protein: number;
@@ -78,5 +90,5 @@ export enum MealType {
   afternoonSnack = 4,
   dinner = 5,
   eveningSnack = 6,
-  unknown = 7
+  anytime = 7
 }

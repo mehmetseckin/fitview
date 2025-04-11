@@ -1,11 +1,11 @@
 import { useFitbitApi } from "@/hooks/useFitbitApi";
-import { FitbitFoodUnit, FoodLogEntry } from "@/types";
+import { FitbitFoodUnit, FoodLog, FoodLogEntry } from "@/types";
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext"; // Import AuthContext to check for user
 
 type FitbitContextType = {
   units: FitbitFoodUnit[];
-  foodLog: FoodLogEntry[];
+  foodLog: FoodLog;
   addFoodLogEntry: (entry: FoodLogEntry) => void;
 };
 
@@ -13,7 +13,26 @@ const FitbitContext = createContext<FitbitContextType | undefined>(undefined);
 
 export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
   const [units, setUnits] = useState<FitbitFoodUnit[]>([]);
-  const [foodLog, setFoodLog] = useState<FoodLogEntry[]>([]);
+  const [foodLog, setFoodLog] = useState<FoodLog>({
+    foods: [],
+    summary: {
+      calories: 0,
+      carbs: 0,
+      protein: 0,
+      fat: 0,
+      fiber: 0,
+      sodium: 0,
+      water: 0
+    },
+    goals: {
+      calories: 0,
+      macros: {
+        carbs: 0,
+        fat: 0,
+        protein: 0
+      }
+    }
+  });
   const isLoaded = useRef(false); // Track if food units are loaded
   const { user } = useAuth(); // Get user and loading state from AuthContext
   const { getFoodUnits, getFoodLog } = useFitbitApi();
@@ -46,7 +65,10 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
   }, [user]);
 
   const addFoodLogEntry = (entry: FoodLogEntry) => {
-    setFoodLog((prevEntries) => [...prevEntries, entry]);
+    setFoodLog((log) => ({
+      ...log,
+      foods: [...log.foods, entry]
+    }));
   };
 
   return (

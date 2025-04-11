@@ -21,7 +21,7 @@ export function getFitbitMealName(mealTypeId: MealType) {
     case MealType.eveningSnack:
       return "Evening Snack";
     default:
-      return "Unknown";
+      return "Anytime";
   }
 }
 
@@ -40,6 +40,6 @@ export function getFitbitMealType(mealName: string) {
     case "evening snack":
       return MealType.eveningSnack;
     default:
-      return MealType.unknown;
+      return MealType.anytime;
   }
 }

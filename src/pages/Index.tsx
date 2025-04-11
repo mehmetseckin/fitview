@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FoodSearch from "@/components/FoodSearch";
-import NutritionSummary from "@/components/NutritionSummary";
 import FoodLogEntryForm from "@/components/FoodLogEntry";
 import DailyGoals from "@/components/DailyGoals";
-import { FitbitFood, FoodLogEntry, MealType, NutritionGoals } from "@/types";
+import { FitbitFood, FoodLogEntry, MealType, FitbitNutritionGoals, FitbitNutritionSummary } from "@/types";
 import { format } from "date-fns";
 import { getFitbitMealName, getFitbitMealType } from "@/lib/utils";
 import { useFitbit } from "@/contexts/FitbitContext";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import NutritionSummary from "@/components/NutritionSummary";
 
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -20,21 +20,30 @@ const Index = () => {
   
   const { foodLog, units, addFoodLogEntry } = useFitbit();
 
-  const [nutritionGoals, setNutritionGoals] = useState<NutritionGoals>({
-    calories: 2000,
+  const [nutritionGoals, setNutritionGoals] = useState<FitbitNutritionGoals>({
+    calories: 0,
     macros: {
-      carbs: 250,
-      fat: 65,
-      protein: 150
+      carbs: 0,
+      fat: 0,
+      protein: 0
     }
   });
 
-  const [summaryData, setSummaryData] = useState({
-    totalCalories: 0,
-    totalCarbs: 0, 
-    totalFat: 0,
-    totalProtein: 0
+  const [summaryData, setSummaryData] = useState<FitbitNutritionSummary>({
+    calories: 0,
+    carbs: 0,
+    fat: 0,
+    protein: 0,
+    fiber: 0,
+    sodium: 0,
+    sugar: 0,
+    water: 0
   });
+
+  useEffect(() => {
+    setNutritionGoals(foodLog.goals);
+    setSummaryData(foodLog.summary);
+  }, [foodLog])
 
   const handleFoodSelect = (food: FitbitFood) => {
     setSelectedFood(food);
@@ -45,10 +54,14 @@ const Index = () => {
     
     // Update summary data
     setSummaryData({
-      totalCalories: summaryData.totalCalories + entry.nutritionalValues.calories,
-      totalCarbs: summaryData.totalCarbs + entry.nutritionalValues.carbs,
-      totalFat: summaryData.totalFat + entry.nutritionalValues.fat,
-      totalProtein: summaryData.totalProtein + entry.nutritionalValues.protein
+      ...summaryData,
+      calories: summaryData.calories + (entry.nutritionalValues?.calories || 0),
+      carbs: summaryData.carbs + (entry.nutritionalValues?.carbs || 0),
+      fat: summaryData.fat + (entry.nutritionalValues?.fat || 0),
+      protein: summaryData.protein + entry.nutritionalValues?.protein,
+      fiber: summaryData.fiber + (entry.nutritionalValues?.fiber || 0),
+      sodium: summaryData.sodium + (entry.nutritionalValues?.sodium || 0),
+      sugar: summaryData.sugar + (entry.nutritionalValues?.sugar || 0),
     });
     
     setIsSearchOpen(false);
@@ -72,21 +85,21 @@ const Index = () => {
               <CardContent>
                 <NutritionSummary 
                   calories={{
-                    consumed: summaryData.totalCalories,
+                    consumed: summaryData.calories,
                     goal: nutritionGoals.calories
                   }}
                   macros={{
                     carbs: {
-                      consumed: summaryData.totalCarbs,
-                      goal: nutritionGoals.macros.carbs
+                      consumed: summaryData.carbs,
+                      goal: nutritionGoals.macros?.carbs || 0
                     },
                     fat: {
-                      consumed: summaryData.totalFat,
-                      goal: nutritionGoals.macros.fat
+                      consumed: summaryData.fat,
+                      goal: nutritionGoals.macros?.fat || 0
                     },
                     protein: {
-                      consumed: summaryData.totalProtein,
-                      goal: nutritionGoals.macros.protein
+                      consumed: summaryData.protein,
+                      goal: nutritionGoals.macros?.protein || 0
                     }
                   }}
                 />
@@ -135,21 +148,21 @@ const Index = () => {
                   </TabsList>
                   
                   <TabsContent value="all" className="space-y-4">
-                    {foodLog.length > 0 ? (
-                      foodLog.map((entry) => (
-                        <Card key={entry.id}>
+                    {foodLog.foods.length > 0 ? (
+                      foodLog.foods.map((entry) => (
+                        <Card key={entry.logId}>
                           <CardContent className="p-4">
                             <div className="flex justify-between items-center">
                               <div>
-                                <h3 className="font-medium">{entry.name}</h3>
+                                <h3 className="font-medium">{entry.loggedFood.name}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                  {entry.amount} {entry.amount !== 1 ? entry.unit.plural : entry.unit.name} • {getFitbitMealName(entry.mealTypeId)}
+                                  {entry.loggedFood.amount} {entry.loggedFood.amount !== 1 ? entry.loggedFood.unit.plural : entry.loggedFood.unit.name} • {getFitbitMealName(entry.loggedFood.mealTypeId)}
                                 </p>
                               </div>
                               <div className="text-right">
                                 <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(entry.loggedAt), "h:mm a")}
+                                  {format(new Date(entry.logDate), "h:mm a")}
                                 </p>
                               </div>
                             </div>
@@ -173,23 +186,23 @@ const Index = () => {
                   {/* Similar TabsContent for breakfast, lunch, dinner, snack */}
                   {["breakfast", "morning snack", "lunch", "afternoon snack", "dinner", "evening snack"].map((mealType) => (
                     <TabsContent key={mealType} value={mealType} className="space-y-4">
-                      {foodLog.filter(entry => entry.mealTypeId === getFitbitMealType(mealType)).length > 0 ? (
-                        foodLog
-                          .filter(entry => entry.mealTypeId === getFitbitMealType(mealType))
+                      {foodLog.foods.filter(entry => entry.loggedFood.mealTypeId === getFitbitMealType(mealType)).length > 0 ? (
+                        foodLog.foods
+                          .filter(entry => entry.loggedFood.mealTypeId === getFitbitMealType(mealType))
                           .map((entry) => (
-                            <Card key={entry.id}>
+                            <Card key={entry.logId}>
                               <CardContent className="p-4">
                                 <div className="flex justify-between items-center">
                                   <div>
-                                    <h3 className="font-medium">{entry.name}</h3>
+                                    <h3 className="font-medium">{entry.loggedFood.name}</h3>
                                     <p className="text-sm text-muted-foreground">
-                                      {entry.amount} {entry.amount !== 1 ? entry.unit.plural : entry.unit.name} • {getFitbitMealName(entry.mealTypeId)}
+                                      {entry.loggedFood.amount} {entry.loggedFood.amount !== 1 ? entry.loggedFood.unit.plural : entry.loggedFood.unit.name} • {getFitbitMealName(entry.loggedFood.mealTypeId)}
                                     </p>
                                   </div>
                                   <div className="text-right">
                                     <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
                                     <p className="text-xs text-muted-foreground">
-                                      {format(new Date(entry.loggedAt), "h:mm a")}
+                                      {format(new Date(entry.logDate), "h:mm a")}
                                     </p>
                                   </div>
                                 </div>
