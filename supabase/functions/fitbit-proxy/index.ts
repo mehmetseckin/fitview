@@ -62,8 +62,9 @@ const relayRequest = async (userId, endpoint, method, body)=>{
   return new Response(responseBody, {
     status: fitbitResponse.status,
     headers: {
+      ...fitbitResponse.headers,
       ...corsHeaders,
-      "Content-Type": fitbitResponse.headers.get("Content-Type") || "application/json"
+      "Content-Type": fitbitResponse.headers.get("Content-Type") || "application/json",
     }
   });
 };
