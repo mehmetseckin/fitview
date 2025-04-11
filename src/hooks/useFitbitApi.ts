@@ -24,6 +24,10 @@ export const useFitbitApi = () => {
     return await fitbitApi.getFoodDetails(foodId);
   };
 
+  const getFrequentFoods = async () => {
+    return await fitbitApi.getFrequentFoods();
+  };
+
   const logFood = async (foodEntry: Omit<FoodLogEntry, "logId" | "logDate">) => {
     return await fitbitApi.logFood(foodEntry);
   };
@@ -32,5 +36,5 @@ export const useFitbitApi = () => {
     return await fitbitApi.getFoodUnits();
   };
 
-  return { getFoodLog, getNutritionSummary, searchFoods, getFoodDetails, logFood, getFoodUnits };
+  return { getFoodLog, getFrequentFoods, getNutritionSummary, searchFoods, getFoodDetails, logFood, getFoodUnits };
 };

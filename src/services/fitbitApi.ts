@@ -1,4 +1,4 @@
-import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit, FoodLog, FitbitNutritionSummary } from "@/types";
+import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit, FoodLog, FitbitNutritionSummary, FrequentFood } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export class FitbitApiService {
@@ -29,7 +29,7 @@ export class FitbitApiService {
     return await this.fitbitApiRequest(`/foods/search.json?query=${encodeURIComponent(query)}`);
   }
 
-  public async getFoodDetails(foodId: string): Promise<FitbitFood | null> {
+  public async getFoodDetails(foodId: string): Promise<{ food: FitbitFood } | null> {
     return await this.fitbitApiRequest(`/foods/${foodId}.json`);
   }
 
@@ -47,6 +47,11 @@ export class FitbitApiService {
   public async getFoodLog(date?: Date): Promise<FoodLog> {
     const dateString = (date ? date : new Date()).toISOString().split("T")[0];
     const data = await this.fitbitApiRequest(`/user/-/foods/log/date/${dateString}.json`);
+    return data;
+  }
+
+  public async getFrequentFoods(): Promise<FrequentFood[]> {
+    const data = await this.fitbitApiRequest(`/user/-/foods/log/frequent.json`);
     return data;
   }
 

@@ -13,12 +13,13 @@ import { getFitbitMealName, getFitbitMealType } from "@/lib/utils";
 import { useFitbit } from "@/contexts/FitbitContext";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import NutritionSummary from "@/components/NutritionSummary";
+import QuickAddCard from "@/components/QuickAddCard";
 
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState<FitbitFood | null>(null);
   
-  const { foodLog, units, addFoodLogEntry } = useFitbit();
+  const { foodLog, units, frequentFoods, addFoodLogEntry } = useFitbit();
 
   const [nutritionGoals, setNutritionGoals] = useState<FitbitNutritionGoals>({
     calories: 0,
@@ -112,7 +113,10 @@ const Index = () => {
                   <CardTitle>Food Log</CardTitle>
                   <CardDescription>Today's logged foods</CardDescription>
                 </div>
-                <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <Dialog open={isSearchOpen || !!selectedFood} onOpenChange={(open) => { 
+                  setIsSearchOpen(open); 
+                  setSelectedFood(open ? selectedFood : null); 
+                }}>
                   <DialogTrigger asChild>
                     <Button className="bg-fitview-primary hover:bg-fitview-accent">
                       Log Food
@@ -235,20 +239,10 @@ const Index = () => {
               onSave={setNutritionGoals} 
             />
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Add</CardTitle>
-                <CardDescription>Frequently logged foods</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Button variant="outline" className="w-full justify-start" onClick={() => setIsSearchOpen(true)}>
-                    Search for foods
-                  </Button>
-                  {/* We'd add favorite/frequent foods here once the user logs more items */}
-                </div>
-              </CardContent>
-            </Card>
+            <QuickAddCard frequentFoods={frequentFoods} onFoodSelect={(food) => {
+              handleFoodSelect(food);
+              setIsSearchOpen(true); 
+            }} />
           </div>
         </div>
       </div>

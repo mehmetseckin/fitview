@@ -29,18 +29,22 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
   const [isLogging, setIsLogging] = useState(false);
   const { toast } = useToast();
   const { getFoodDetails, logFood } = useFitbitApi();
-  const [foodDetails, setFoodDetails] = useState<FitbitFood | null>(null);
+  const [isDetailsLoaded, setIsDetailsLoaded] = useState(false);
+  const [foodDetails, setFoodDetails] = useState<FitbitFood | null>(food);
 
   useEffect(() => {
-    if (!food) return;
+    if(isDetailsLoaded)
+      return;
+
     getFoodDetails(food.foodId)
-      .then((details) => {
-        setFoodDetails(details);
+      .then((data) => {
+        setFoodDetails(data.food);
+        setIsDetailsLoaded(true);
       })
       .catch((error) => {
         console.error("Error fetching food details:", error);
       });
-  }, [food]);
+  }, [isDetailsLoaded, food]);
   
   const handleSubmit = async () => {
     try {
@@ -59,19 +63,19 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
       
       const entry = await logFood({
         loggedFood: {
-          foodId: food.foodId,
-          name: food.name,
-          brand: food.brand,
+          foodId: foodDetails.foodId,
+          name: foodDetails.name,
+          brand: foodDetails.brand,
           mealTypeId: mealType,
           amount: amountValue,
           unit: unit,
-          calories: food.calories
+          calories: foodDetails.calories
         }
       });
       
       toast({
         title: "Food logged successfully",
-        description: `Added ${food.name} to your ${getFitbitMealName(mealType)} log`,
+        description: `Added ${foodDetails.name} to your ${getFitbitMealName(mealType)} log`,
       });
       
       onLog(entry);
@@ -88,13 +92,13 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
     }
   };
 
-  return (
+  return isDetailsLoaded ? (
     <Card>
       <CardContent className="p-6">
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-medium">{food.name}</h3>
-            <p className="text-sm text-muted-foreground">{food.brand}</p>
+            <h3 className="text-lg font-medium">{foodDetails.name}</h3>
+            <p className="text-sm text-muted-foreground">{foodDetails.brand}</p>
           </div>
           
           <div className="grid grid-cols-3 gap-4">
@@ -116,14 +120,15 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {food.units.map((unitId) => {
-                    const u = units.find((_) => _.id === unitId);
-                    return !!u && (
-                    <SelectItem key={u.id} value={u.id}>
+                  {foodDetails.servings.map((serving) => {
+                    const u = serving.unit;
+                    return (
+                      <SelectItem key={u.id} value={u.id}>
                         {amount !== "1" ? u.plural : u.name}
                       </SelectItem>
                     );
-                  })}
+                  }
+                )}
                 </SelectContent>
               </Select>
             </div>
@@ -150,19 +155,19 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
             <h4 className="text-sm font-medium mb-2">Nutrition</h4>
             <div className="grid grid-cols-4 gap-2 text-sm">
               <div>
-                <p className="font-medium">{food.nutritionalValues?.calories.toFixed(0)}</p>
+                <p className="font-medium">{foodDetails.nutritionalValues?.calories.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground">calories</p>
               </div>
               <div>
-                <p className="font-medium">{food.nutritionalValues?.carbs.toFixed(1)}g</p>
+                <p className="font-medium">{foodDetails.nutritionalValues?.carbs.toFixed(1)}g</p>
                 <p className="text-xs text-muted-foreground">carbs</p>
               </div>
               <div>
-                <p className="font-medium">{food.nutritionalValues?.fat.toFixed(1)}g</p>
+                <p className="font-medium">{foodDetails.nutritionalValues?.fat.toFixed(1)}g</p>
                 <p className="text-xs text-muted-foreground">fat</p>
               </div>
               <div>
-                <p className="font-medium">{food.nutritionalValues?.protein.toFixed(1)}g</p>
+                <p className="font-medium">{foodDetails.nutritionalValues?.protein.toFixed(1)}g</p>
                 <p className="text-xs text-muted-foreground">protein</p>
               </div>
             </div>
@@ -183,7 +188,8 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
         </div>
       </CardContent>
     </Card>
-  );
+  )
+  : <p>Loading...</p>;
 };
 
 export default FoodLogEntryForm;

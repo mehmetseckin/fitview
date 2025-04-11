@@ -1,11 +1,12 @@
 import { useFitbitApi } from "@/hooks/useFitbitApi";
-import { FitbitFoodUnit, FoodLog, FoodLogEntry } from "@/types";
+import { FitbitFoodUnit, FoodLog, FoodLogEntry, FrequentFood } from "@/types";
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext"; // Import AuthContext to check for user
 
 type FitbitContextType = {
   units: FitbitFoodUnit[];
   foodLog: FoodLog;
+  frequentFoods: FrequentFood[];
   addFoodLogEntry: (entry: FoodLogEntry) => void;
 };
 
@@ -33,9 +34,10 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
   });
+  const [frequentFoods, setFrequentFoods] = useState<FrequentFood[]>([]); // State to store frequent food
   const isLoaded = useRef(false); // Track if food units are loaded
   const { user } = useAuth(); // Get user and loading state from AuthContext
-  const { getFoodUnits, getFoodLog } = useFitbitApi();
+  const { getFoodUnits, getFoodLog, getFrequentFoods } = useFitbitApi();
 
   useEffect(() => {
     // Wait until the AuthContext has finished loading and the user is available
@@ -52,7 +54,7 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Error fetching food units:", error);
       });
 
-    const foodLogPromise = getFoodLog()
+      const foodLogPromise = getFoodLog()
       .then((data) => {
         setFoodLog(data);
       })
@@ -60,7 +62,15 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Error fetching food log:", error);
       });
       
-      Promise.all([unitsPromise, foodLogPromise])
+      const frequentFoodsPromise = getFrequentFoods()
+      .then((data) => {
+        setFrequentFoods(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching food log:", error);
+      });
+      
+      Promise.all([unitsPromise, foodLogPromise, frequentFoodsPromise])
         .then(() => (isLoaded.current = true)); // Mark as loaded to prevent re-fetching
   }, [user]);
 
@@ -72,7 +82,7 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <FitbitContext.Provider value={{ units, foodLog, addFoodLogEntry }}>
+    <FitbitContext.Provider value={{ units, foodLog, frequentFoods, addFoodLogEntry }}>
       {children}
     </FitbitContext.Provider>
   );
