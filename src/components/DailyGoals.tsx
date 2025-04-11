@@ -20,9 +20,9 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
     // Validate the inputs
     if (
       editedGoals.calories <= 0 ||
-      editedGoals.macros.carbs <= 0 ||
-      editedGoals.macros.fat <= 0 ||
-      editedGoals.macros.protein <= 0
+      editedGoals.macros?.carbs <= 0 ||
+      editedGoals.macros?.fat <= 0 ||
+      editedGoals.macros?.protein <= 0
     ) {
       toast({
         title: "Invalid values",
@@ -130,7 +130,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                 {isEditing ? (
                   <Input
                     type="number"
-                    value={editedGoals.macros.fat}
+                    value={editedGoals.macros?.fat}
                     onChange={(e) =>
                       setEditedGoals({
                         ...editedGoals,
@@ -151,7 +151,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                 {isEditing ? (
                   <Input
                     type="number"
-                    value={editedGoals.macros.protein}
+                    value={editedGoals.macros?.protein}
                     onChange={(e) =>
                       setEditedGoals({
                         ...editedGoals,
