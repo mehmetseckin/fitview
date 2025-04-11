@@ -27,18 +27,6 @@ const Navbar = () => {
               Dashboard
             </Link>
             <Link
-              to="/nutrition"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Nutrition
-            </Link>
-            <Link
-              to="/goals"
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Goals
-            </Link>
-            <Link
               to="/connect-services"
               className="text-sm font-medium transition-colors hover:text-primary"
             >
@@ -50,13 +38,6 @@ const Navbar = () => {
         <div className="flex items-center space-x-4 ml-auto">
           {user ? (
             <>
-              <Button variant="outline" size="sm">
-                <SearchIcon className="h-4 w-4 mr-2" />
-                Search
-              </Button>
-              <Button className="bg-fitview-primary hover:bg-fitview-accent" size="sm">
-                Log Food
-              </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
