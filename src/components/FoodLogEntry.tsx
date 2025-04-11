@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,8 +28,20 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
   const [unit, setUnit] = useState(food.defaultUnit);
   const [isLogging, setIsLogging] = useState(false);
   const { toast } = useToast();
-  const { logFood } = useFitbitApi();
+  const { getFoodDetails, logFood } = useFitbitApi();
+  const [foodDetails, setFoodDetails] = useState<FitbitFood | null>(null);
 
+  useEffect(() => {
+    if (!food) return;
+    getFoodDetails(food.foodId)
+      .then((details) => {
+        setFoodDetails(details);
+      })
+      .catch((error) => {
+        console.error("Error fetching food details:", error);
+      });
+  }, [food]);
+  
   const handleSubmit = async () => {
     try {
       setIsLogging(true);
@@ -46,14 +58,15 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
       }
       
       const entry = await logFood({
-        foodId: food.foodId,
-        name: food.name,
-        brand: food.brand,
-        mealTypeId: mealType,
-        amount: amountValue,
-        unit: unit,
-        calories: food.calories,
-        nutritionalValues: food.nutritionalValues,
+        loggedFood: {
+          foodId: food.foodId,
+          name: food.name,
+          brand: food.brand,
+          mealTypeId: mealType,
+          amount: amountValue,
+          unit: unit,
+          calories: food.calories
+        }
       });
       
       toast({

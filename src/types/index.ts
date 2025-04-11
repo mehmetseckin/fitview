@@ -1,6 +1,7 @@
 
 // Fitbit API Types
 export interface FitbitFood {
+  accessLevel: "PUBLIC" | "PRIVATE";
   foodId: string;
   name: string;
   brand: string;
@@ -8,6 +9,14 @@ export interface FitbitFood {
   units: string[];
   defaultServingSize: number;
   defaultUnit: FitbitFoodUnit;
+  isGeneric: boolean;
+  locale: string;
+  servings: {
+    multiplier: number,
+    servingSize: number,
+    unit: FitbitFoodUnit,
+    unitId: number,
+  }
   nutritionalValues: {
     calories: number;
     carbs: number;
@@ -36,7 +45,7 @@ export interface FoodLog {
 }
 
 export interface FoodLogEntry {
-  isFavorite: boolean;
+  isFavorite?: boolean;
   logId: string;
   logDate: Date;
   loggedFood: LoggedFood;
@@ -59,8 +68,8 @@ export interface LoggedFood {
   amount: number;
   unit: FitbitFoodUnit;
   calories: number;
-  accesLevel: "PUBLIC" | "PRIVATE";
-  locale: string;
+  accesLevel?: "PUBLIC" | "PRIVATE";
+  locale?: string;
 }
 
 export interface FitbitNutritionSummary {
