@@ -3,17 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { NutritionGoals } from "@/types";
+import { FitbitNutritionGoals } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 
 interface DailyGoalsProps {
-  goals: NutritionGoals;
-  onSave: (goals: NutritionGoals) => void;
+  goals: FitbitNutritionGoals;
+  onSave: (goals: FitbitNutritionGoals) => void;
 }
 
 const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedGoals, setEditedGoals] = useState<NutritionGoals>(goals);
+  const [editedGoals, setEditedGoals] = useState<FitbitNutritionGoals>(goals);
   const { toast } = useToast();
 
   const handleSave = () => {
