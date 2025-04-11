@@ -6,7 +6,7 @@ import { FoodLogEntry } from "@/types";
 export const useFitbitApi = () => {
   const { user } = useAuth();
 
-  const fitbitApi = useMemo(() => new FitbitApiService(user), [user]);
+  const fitbitApi = useMemo(() => new FitbitApiService(user), [user?.id]);
 
   const getFoodLog = async (date?: Date) => {
     return await fitbitApi.getFoodLog(date);

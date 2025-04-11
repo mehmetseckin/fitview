@@ -64,7 +64,7 @@ const FitbitCallback = () => {
     if(!isProcessing) {
       processOAuthCallback();
     }
-  }, [searchParams, user, isLoading, navigate]);
+  }, [searchParams, user?.id, isLoading, navigate]);
 
   if (isLoading) {
     // Show a loading state while AuthContext is loading

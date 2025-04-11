@@ -72,17 +72,24 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
       
       Promise.all([unitsPromise, foodLogPromise, frequentFoodsPromise])
         .then(() => (isLoaded.current = true)); // Mark as loaded to prevent re-fetching
-  }, [user]);
+  }, [user?.id]);
 
-  const addFoodLogEntry = (entry: FoodLogEntry) => {
+  const addFoodLogEntry = useCallback((entry: FoodLogEntry) => {
     setFoodLog((log) => ({
       ...log,
       foods: [...log.foods, entry]
     }));
-  };
+  }, []);
+
+  const value = useMemo(() => ({ 
+    units, 
+    foodLog, 
+    frequentFoods, 
+    addFoodLogEntry 
+  }), [units, foodLog, frequentFoods, addFoodLogEntry]);
 
   return (
-    <FitbitContext.Provider value={{ units, foodLog, frequentFoods, addFoodLogEntry }}>
+    <FitbitContext.Provider value={value}>
       {children}
     </FitbitContext.Provider>
   );

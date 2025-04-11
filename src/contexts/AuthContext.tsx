@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -46,21 +46,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+  }, [supabase]);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin + '/connect-services'
       }
     });
-  };
+  }, [supabase]);
+
+  const value = useMemo(() => ({
+    user,
+    session,
+    isLoading: isLoading.current,
+    signOut,
+    signInWithGoogle,
+  }), [user, session]);
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading: isLoading.current, signOut, signInWithGoogle }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
