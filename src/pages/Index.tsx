@@ -126,7 +126,6 @@ const Index = () => {
                     {selectedFood ? (
                       <FoodLogEntryForm 
                         food={selectedFood}
-                        units={units}
                         onClose={() => setSelectedFood(null)} 
                         onLog={handleFoodLog}
                       />

@@ -17,20 +17,20 @@ import { getFitbitMealName } from "@/lib/utils";
 
 interface FoodLogEntryProps {
   food: FitbitFood;
-  units: FitbitFoodUnit[];
   onClose: () => void;
   onLog: (entry: FoodLogEntry) => void;
 }
 
-const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) => {
+const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
   const [mealType, setMealType] = useState<MealType>(MealType.breakfast);
-  const [amount, setAmount] = useState("1");
+  const [amount, setAmount] = useState(1);
   const [unit, setUnit] = useState(food.defaultUnit);
   const [isLogging, setIsLogging] = useState(false);
   const { toast } = useToast();
   const { getFoodDetails, logFood } = useFitbitApi();
   const [isDetailsLoaded, setIsDetailsLoaded] = useState(false);
   const [foodDetails, setFoodDetails] = useState<FitbitFood | null>(food);
+  const [calories, setCalories] = useState(food.calories);
 
   useEffect(() => {
     if(isDetailsLoaded)
@@ -46,13 +46,18 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
       });
   }, [isDetailsLoaded, food]);
   
+  useEffect(() => {
+    let serving = foodDetails.servings?.find((s) => s.unit.id === unit.id);
+    if (serving) {
+      setCalories(amount * serving.multiplier * food.calories);
+    }
+  }, [amount, unit]);
+
   const handleSubmit = async () => {
     try {
       setIsLogging(true);
       
-      const amountValue = parseFloat(amount);
-      
-      if (isNaN(amountValue) || amountValue <= 0) {
+      if (amount <= 0) {
         toast({
           title: "Invalid amount",
           description: "Please enter a valid amount greater than zero",
@@ -67,7 +72,7 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
           name: foodDetails.name,
           brand: foodDetails.brand,
           mealTypeId: mealType,
-          amount: amountValue,
+          amount: amount,
           unit: unit,
           calories: foodDetails.calories
         }
@@ -107,7 +112,7 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
               <Input
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(parseFloat(e.target.value))}
                 min="0"
                 step="0.1"
               />
@@ -115,7 +120,7 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Unit</label>
-              <Select value={unit.id} onValueChange={(value) => setUnit(units.find((u) => u.id === value))}>
+              <Select value={unit.id} onValueChange={(value) => setUnit(foodDetails.servings.find((s) => s.unit.id === value).unit)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -124,7 +129,7 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
                     const u = serving.unit;
                     return (
                       <SelectItem key={u.id} value={u.id}>
-                        {amount !== "1" ? u.plural : u.name}
+                        {amount !== 1 ? u.plural : u.name}
                       </SelectItem>
                     );
                   }
@@ -155,7 +160,7 @@ const FoodLogEntryForm = ({ food, units, onClose, onLog }: FoodLogEntryProps) =>
             <h4 className="text-sm font-medium mb-2">Nutrition</h4>
             <div className="grid grid-cols-4 gap-2 text-sm">
               <div>
-                <p className="font-medium">{foodDetails.nutritionalValues?.calories.toFixed(0)}</p>
+                <p className="font-medium">{calories.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground">calories</p>
               </div>
               <div>
