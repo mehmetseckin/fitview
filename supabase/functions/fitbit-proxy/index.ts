@@ -15,9 +15,15 @@ const corsHeaders = {
 };
 
 // Cache TTLs in milliseconds
-const TTL_4_HOURS = 4 * 60 * 60 * 1000;
+const TTL_1_MINUTE = 1 * 1 * 60 * 1000;
 const TTL_1_DAY = 24 * 60 * 60 * 1000;
 const CACHE_TABLE_NAME = 'edge_function_cache';
+const CACHED_ENDPOINTS = [
+  "/1/user/-/foods/log/frequent.json",
+  "/1/user/-/foods/log/date/",
+  "/1/foods/units.json",
+  "/1/foods/(\\d+).json",
+]
 
 const getUserAccessToken = async (userId: string): Promise<string> => {
   // ...existing code... (no changes needed here)
@@ -77,18 +83,18 @@ const relayRequest = async (
 
   // Determine cache key, TTL, and user association based on endpoint
   if (method === "GET") {
-    if (endpoint === "/1/foods/units.json") {
-      cacheKey = `global:${endpoint}`;
-      cacheTTL = TTL_4_HOURS;
-      cacheUserId = null; // Global cache
-    } else if (endpoint === `/1/user/-/foods/log/frequent.json`) {
-      cacheKey = `user:${userId}:${endpoint}`;
-      cacheTTL = TTL_1_DAY;
-      cacheUserId = userId; // User-specific cache
-    } else if (endpoint.startsWith(`/1/user/-/foods/log/date/`)) {
-      cacheKey = `user:${userId}:${endpoint}`; // Key includes the date
-      cacheTTL = TTL_1_DAY;
-      cacheUserId = userId; // User-specific cache
+    
+    // Check if the endpoint is cacheable
+    const isCacheable = CACHED_ENDPOINTS.some((pattern) => {
+      const regex = new RegExp(pattern);
+      return regex.test(endpoint);
+    });
+    
+    if(isCacheable) {
+      let cacheType = endpoint.indexOf("user") > -1 ? "user" : "global";
+      cacheKey = [cacheType, userId, endpoint].filter(Boolean).join(":");
+      cacheUserId = cacheType === "user" ? userId : null;
+      cacheTTL = cacheType === "user" ? TTL_1_MINUTE : TTL_1_DAY;
     }
   }
 
