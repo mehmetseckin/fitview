@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FitbitNutritionGoals } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -13,25 +13,28 @@ interface DailyGoalsProps {
 
 const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedGoals, setEditedGoals] = useState<FitbitNutritionGoals>(goals);
+  const [editedGoals, setEditedGoals] = useState<FitbitNutritionGoals>({
+    calories: goals.calories,
+    macros: {
+      carbs: goals.macros?.carbs || 0,
+      fat: goals.macros?.fat || 0,
+      protein: goals.macros?.protein || 0,
+    }
+  });
   const { toast } = useToast();
 
+  useEffect(() => {
+    setEditedGoals({
+      calories: goals.calories,
+      macros: {
+        carbs: goals.macros?.carbs || 0,
+        fat: goals.macros?.fat || 0,
+        protein: goals.macros?.protein || 0,
+      }
+    });
+  }, [goals]);
+
   const handleSave = () => {
-    // Validate the inputs
-    if (
-      editedGoals.calories <= 0 ||
-      editedGoals.macros?.carbs <= 0 ||
-      editedGoals.macros?.fat <= 0 ||
-      editedGoals.macros?.protein <= 0
-    ) {
-      toast({
-        title: "Invalid values",
-        description: "All values must be greater than zero",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     onSave(editedGoals);
     setIsEditing(false);
     toast({
@@ -41,7 +44,14 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
   };
 
   const handleCancel = () => {
-    setEditedGoals(goals);
+    setEditedGoals({
+      calories: goals.calories,
+      macros: {
+        carbs: goals.macros?.carbs || 0,
+        fat: goals.macros?.fat || 0,  
+        protein: goals.macros?.protein || 0
+      }
+    });
     setIsEditing(false);
   };
 
@@ -96,7 +106,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                   min="0"
                 />
               ) : (
-                <p>{goals.calories} cal</p>
+                <p>{editedGoals.calories} cal</p>
               )}
             </div>
           </div>
@@ -122,7 +132,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                     min="0"
                   />
                 ) : (
-                  <p>{goals.macros?.carbs || 0}g</p>
+                  <p>{editedGoals.macros?.carbs || 0}g</p>
                 )}
               </div>
               <div>
@@ -143,7 +153,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                     min="0"
                   />
                 ) : (
-                  <p>{goals.macros?.fat || 0}g</p>
+                  <p>{editedGoals.macros?.fat || 0}g</p>
                 )}
               </div>
               <div>
@@ -164,7 +174,7 @@ const DailyGoals = ({ goals, onSave }: DailyGoalsProps) => {
                     min="0"
                   />
                 ) : (
-                  <p>{goals.macros?.protein || 0}g</p>
+                  <p>{editedGoals.macros?.protein || 0}g</p>
                 )}
               </div>
             </div>
