@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -6,10 +5,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Database } from "lucide-react"; 
 import fitbitAppIcon from '@/assets/images/fitbit-app-icon.png';
 
-const ConnectServices = () => {
+const Settings = () => {
   const { user } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "checking">("checking");
@@ -105,7 +104,7 @@ const ConnectServices = () => {
       <Navbar />
       
       <div className="container py-6">
-        <h1 className="text-3xl font-bold mb-6">Connect Services</h1>
+        <h1 className="text-3xl font-bold mb-6">Settings</h1>
         
         <div className="max-w-md mx-auto">
           <Card>
@@ -163,9 +162,34 @@ const ConnectServices = () => {
             </CardFooter>
           </Card>
         </div>
+        <div className="max-w-md mx-auto mt-6">
+        <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-6 w-6 mr-2" /> 
+                Cache
+              </CardTitle>
+              <CardDescription>
+                Manage cached data fetched from Fitbit to improve performance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">Cache management options coming soon.</p> 
+            </CardContent>
+            <CardFooter>
+               <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  disabled
+                >
+                  Clear Cache
+                </Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ConnectServices;
+export default Settings;

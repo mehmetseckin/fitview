@@ -75,7 +75,7 @@ const Auth = () => {
         description: "Welcome back to FitView!",
       });
       
-      navigate("/connect-services");
+      navigate("/settings");
     } catch (error) {
       toast({
         title: "An error occurred",
@@ -109,7 +109,7 @@ const Auth = () => {
         description: "Welcome to FitView! Please check your email to verify your account.",
       });
       
-      navigate("/connect-services");
+      navigate("/settings");
     } catch (error) {
       toast({
         title: "An error occurred",

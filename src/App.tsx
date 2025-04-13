@@ -11,7 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import FitbitCallback from "./pages/FitbitCallback";
-import ConnectServices from "./pages/ConnectServices";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -53,10 +53,10 @@ const App = () => (
               element={<FitbitCallback />} 
             />
             <Route 
-              path="/connect-services" 
+              path="/settings" 
               element={
                 <ProtectedRoute>
-                  <ConnectServices />
+                  <Settings />
                 </ProtectedRoute>
               } 
             />

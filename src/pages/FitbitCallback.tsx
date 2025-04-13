@@ -25,7 +25,7 @@ const FitbitCallback = () => {
         if (error) {
           console.error("OAuth error:", error);
           toast.error("Failed to connect with Fitbit");
-          navigate("/connect-services");
+          navigate("/settings");
           return;
         }
 
@@ -57,7 +57,7 @@ const FitbitCallback = () => {
         toast.error("An unexpected error occurred");
       } finally {
         setIsProcessing(false);
-        navigate("/connect-services");
+        navigate("/settings");
       }
     };
     

@@ -27,10 +27,10 @@ const Navbar = () => {
               Dashboard
             </Link>
             <Link
-              to="/connect-services"
+              to="/settings"
               className="text-sm font-medium transition-colors hover:text-primary"
             >
-              Connect Services
+              Settings
             </Link>
           </nav>
         )}
