@@ -40,7 +40,7 @@ export class FitbitApiService {
       mealTypeId: mealTypeId.toString(),
       unitId: unit.id.toString(),
       amount: amount.toString(),
-      date: (new Date()).toISOString().split("T")[0],
+      date: (new Date()).toISOString(),
     });
     const data = await this.fitbitApiRequest(`/user/-/foods/log.json?${parameters}`, "POST");
     return data;

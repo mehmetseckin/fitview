@@ -151,9 +151,6 @@ const Index = () => {
                               </div>
                               <div className="text-right">
                                 <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {format(new Date(entry.logDate), "h:mm a")}
-                                </p>
                               </div>
                             </div>
                           </CardContent>
@@ -191,9 +188,6 @@ const Index = () => {
                                   </div>
                                   <div className="text-right">
                                     <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {format(new Date(entry.logDate), "h:mm a")}
-                                    </p>
                                   </div>
                                 </div>
                               </CardContent>
