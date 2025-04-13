@@ -207,8 +207,11 @@ const relayRequest = async (
        console.error(`Fitbit API request failed for endpoint ${endpoint}: Status ${fitbitResponse.status}, Body: ${responseBodyText.substring(0, 500)}`);
     }
 
+    // Determine whether response should have body
+    const hasBody = ![101, 204, 205, 304].some(status => status === fitbitResponse.status);
+
     // Return the actual response from Fitbit API
-    return new Response(responseBodyText, {
+    return new Response(hasBody ? responseBodyText : null, {
       status: fitbitResponse.status,
       headers: responseHeaders, // Use headers with CORS and Cache Status
     });

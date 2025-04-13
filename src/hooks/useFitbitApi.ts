@@ -36,5 +36,18 @@ export const useFitbitApi = () => {
     return await fitbitApi.getFoodUnits();
   };
 
-  return { getFoodLog, getFrequentFoods, getNutritionSummary, searchFoods, getFoodDetails, logFood, getFoodUnits };
+  const deleteFoodLog = async (logId: string) => {
+    return await fitbitApi.deleteFoodLog(logId);
+  }
+
+  return { 
+    getFoodLog, 
+    getFrequentFoods, 
+    getNutritionSummary, 
+    searchFoods, 
+    getFoodDetails, 
+    logFood, 
+    getFoodUnits, 
+    deleteFoodLog 
+  };
 };

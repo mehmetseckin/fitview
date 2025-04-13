@@ -8,6 +8,7 @@ type FitbitContextType = {
   foodLog: FoodLog;
   frequentFoods: FrequentFood[];
   addFoodLogEntry: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
+  deleteFoodLogEntry: (logId: string) => void;
 };
 
 const FitbitContext = createContext<FitbitContextType | undefined>(undefined);
@@ -82,12 +83,20 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   }, []);
 
+  const deleteFoodLogEntry = useCallback((logId: string) => {
+    setFoodLog((log) => ({
+      ...log,
+      foods: [...log.foods.filter(f => f.logId !== logId)],
+    }));
+  }, []);
+
   const value = useMemo(() => ({ 
     units, 
     foodLog, 
     frequentFoods, 
-    addFoodLogEntry 
-  }), [units, foodLog, frequentFoods, addFoodLogEntry]);
+    addFoodLogEntry,
+    deleteFoodLogEntry
+  }), [units, foodLog, frequentFoods, addFoodLogEntry, deleteFoodLogEntry]);
 
   return (
     <FitbitContext.Provider value={value}>

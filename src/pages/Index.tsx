@@ -20,7 +20,7 @@ const Index = () => {
   const [selectedFood, setSelectedFood] = useState<FitbitFood | null>(null);
   const [selectedFoodLog, setSelectedFoodLog] = useState<FoodLogEntry | null>(null);
   
-  const { foodLog, units, frequentFoods, addFoodLogEntry } = useFitbit();
+  const { foodLog, units, frequentFoods, addFoodLogEntry, deleteFoodLogEntry } = useFitbit();
 
   const [nutritionGoals, setNutritionGoals] = useState<FitbitNutritionGoals>({
     calories: 0,
@@ -53,6 +53,11 @@ const Index = () => {
 
   const handleFoodLog = (entry: FoodLogEntry, summary: FitbitNutritionSummary) => {
     addFoodLogEntry(entry, summary);
+    setIsSearchOpen(false);
+  };
+
+  const handleFoodDelete = (logId: string) => {
+    deleteFoodLogEntry(logId);
     setIsSearchOpen(false);
   };
 
@@ -123,6 +128,7 @@ const Index = () => {
                           setSelectedFoodLog(null);
                         }}
                         onLog={handleFoodLog}
+                        onDelete={handleFoodDelete}
                       />
                     ) : (
                       <div>

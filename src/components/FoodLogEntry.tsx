@@ -9,6 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input";
 import { FitbitFood, FitbitFoodUnit, FitbitNutritionSummary, FoodLogEntry, MealType } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,19 +31,21 @@ interface FoodLogEntryProps {
   food: FitbitFood;
   onClose: () => void;
   onLog: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
+  onDelete: (logId: string) => void;
 }
 
-const FoodLogEntryForm = ({ foodLog, food, onClose, onLog }: FoodLogEntryProps) => {
+const FoodLogEntryForm = ({ foodLog, food, onClose, onLog, onDelete }: FoodLogEntryProps) => {
   const [mealType, setMealType] = useState<MealType>(foodLog?.loggedFood.mealTypeId || MealType.breakfast);
   const [amount, setAmount] = useState(foodLog?.loggedFood.amount || food?.defaultServingSize || 1);
   const [unit, setUnit] = useState(foodLog?.loggedFood.unit || food?.defaultUnit);
   const [isLogging, setIsLogging] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
-  const { getFoodDetails, logFood } = useFitbitApi();
+  const { getFoodDetails, logFood, deleteFoodLog } = useFitbitApi();
   const [isDetailsLoaded, setIsDetailsLoaded] = useState(false);
   const [foodDetails, setFoodDetails] = useState<FitbitFood | null>(food);
   const [calories, setCalories] = useState(foodLog?.loggedFood.calories || food?.calories);
-
+  const nutritionalValues = foodLog?.nutritionalValues || foodDetails?.nutritionalValues;
   useEffect(() => {
     if(isDetailsLoaded)
       return;
@@ -108,6 +121,33 @@ const FoodLogEntryForm = ({ foodLog, food, onClose, onLog }: FoodLogEntryProps) 
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      
+      const logId = foodLog?.logId;
+      if(!!logId) {
+        const response = await deleteFoodLog(logId);
+        toast({
+          title: "Food log deleted successfully",
+          description: `Deleted ${foodDetails.name} from your ${getFitbitMealName(mealType)} log.`,
+        });
+        
+        onDelete(logId);
+      }
+    } catch (error) {
+      console.error("Error deleting food log:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete food log. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleting(false);
+      onClose();
+    }
+  };
+
   return isDetailsLoaded ? (
     <Card>
       <CardContent className="p-6">
@@ -174,34 +214,63 @@ const FoodLogEntryForm = ({ foodLog, food, onClose, onLog }: FoodLogEntryProps) 
                 <p className="font-medium">{calories.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground">calories</p>
               </div>
-              {foodDetails.nutritionalValues && (<>
+              {nutritionalValues && (<>
                 <div>
-                  <p className="font-medium">{foodDetails.nutritionalValues.carbs.toFixed(1)}g</p>
+                  <p className="font-medium">{nutritionalValues.carbs.toFixed(1)}g</p>
                   <p className="text-xs text-muted-foreground">carbs</p>
                 </div>
                 <div>
-                  <p className="font-medium">{foodDetails.nutritionalValues.fat.toFixed(1)}g</p>
+                  <p className="font-medium">{nutritionalValues.fat.toFixed(1)}g</p>
                   <p className="text-xs text-muted-foreground">fat</p>
                 </div>
                 <div>
-                  <p className="font-medium">{foodDetails.nutritionalValues.protein.toFixed(1)}g</p>
+                  <p className="font-medium">{nutritionalValues.protein.toFixed(1)}g</p>
                   <p className="text-xs text-muted-foreground">protein</p>
                 </div>
               </>)}
             </div>
           </div>
-          
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button 
-              className="bg-fitview-primary hover:bg-fitview-accent" 
-              onClick={handleSubmit}
-              disabled={isLogging}
-            >
-              {isLogging ? "Logging..." : "Log Food"}
-            </Button>
+          <div className="flex justify-between">
+            {
+              !!foodLog && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="destructive"
+                      disabled={isLogging || isDeleting}
+                    >
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </Button>                    
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your
+                        food log entry.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )
+            }
+
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button 
+                className="bg-fitview-primary hover:bg-fitview-accent" 
+                onClick={handleSubmit}
+                disabled={isLogging || isDeleting}
+              >
+                {isLogging ? "Logging..." : "Log Food"}
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -45,11 +45,16 @@ export class FitbitApiService {
       amount: amount.toString()
     });
 
-    if(!!logId) {
+    if(!logId) {
       parameters.append("date", (new Date()).toISOString());
     }
 
     const data = await this.fitbitApiRequest(`${endpoint}?${parameters}`, "POST");
+    return data;
+  }
+
+  public async deleteFoodLog(logId: string): Promise<any> {
+    const data = await this.fitbitApiRequest(`/user/-/foods/log/${logId}.json`, "DELETE");
     return data;
   }
 
