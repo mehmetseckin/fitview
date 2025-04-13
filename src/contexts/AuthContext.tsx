@@ -16,21 +16,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const isLoading = useRef(true);
-  const hasInitialised = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
 
-    if(hasInitialised.current) {
-      return
-    }
-    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        isLoading.current = false;
+        setIsLoading(false);
       }
     );
 
@@ -38,11 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      isLoading.current = false;
+      setIsLoading(false);
     });
 
-    hasInitialised.current = true;
-    
     return () => subscription.unsubscribe();
   }, []);
 
@@ -62,10 +55,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = useMemo(() => ({
     user,
     session,
-    isLoading: isLoading.current,
+    isLoading,
     signOut,
     signInWithGoogle,
-  }), [user, session]);
+  }), [user, session, isLoading, signOut, signInWithGoogle]);
 
   return (
     <AuthContext.Provider value={value}>
