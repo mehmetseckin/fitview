@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { FitbitFood, FitbitFoodUnit, FoodLogEntry, MealType } from "@/types";
+import { FitbitFood, FitbitFoodUnit, FitbitNutritionSummary, FoodLogEntry, MealType } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 import { useFitbitApi } from "@/hooks/useFitbitApi";
 import { getFitbitMealName } from "@/lib/utils";
@@ -18,7 +18,7 @@ import { getFitbitMealName } from "@/lib/utils";
 interface FoodLogEntryProps {
   food: FitbitFood;
   onClose: () => void;
-  onLog: (entry: FoodLogEntry) => void;
+  onLog: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
 }
 
 const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
@@ -66,7 +66,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
         return;
       }
       
-      const entry = await logFood({
+      const response = await logFood({
         loggedFood: {
           foodId: foodDetails.foodId,
           name: foodDetails.name,
@@ -83,8 +83,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
         description: `Added ${foodDetails.name} to your ${getFitbitMealName(mealType)} log`,
       });
       
-      onLog(entry);
-      onClose();
+      onLog(response.foodLog, response.foodDay.summary);
     } catch (error) {
       console.error("Error logging food:", error);
       toast({
@@ -94,6 +93,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
       });
     } finally {
       setIsLogging(false);
+      onClose();
     }
   };
 

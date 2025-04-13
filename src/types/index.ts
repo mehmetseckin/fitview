@@ -88,6 +88,14 @@ export interface FitbitNutritionSummary {
   water: number;
 }
 
+export interface FitbitLogFoodResponse {
+  foodDay: {
+    date: Date;
+    summary: FitbitNutritionSummary;
+  }
+  foodLog: FoodLogEntry;
+}
+
 export interface FitbitNutritionGoals {
   calories: number;
   macros?: {

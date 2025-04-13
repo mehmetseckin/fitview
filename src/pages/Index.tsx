@@ -50,21 +50,8 @@ const Index = () => {
     setSelectedFood(food);
   };
 
-  const handleFoodLog = (entry: FoodLogEntry) => {
-    addFoodLogEntry(entry);
-    
-    // Update summary data
-    setSummaryData({
-      ...summaryData,
-      calories: summaryData.calories + (entry.nutritionalValues?.calories || 0),
-      carbs: summaryData.carbs + (entry.nutritionalValues?.carbs || 0),
-      fat: summaryData.fat + (entry.nutritionalValues?.fat || 0),
-      protein: summaryData.protein + entry.nutritionalValues?.protein,
-      fiber: summaryData.fiber + (entry.nutritionalValues?.fiber || 0),
-      sodium: summaryData.sodium + (entry.nutritionalValues?.sodium || 0),
-      sugar: summaryData.sugar + (entry.nutritionalValues?.sugar || 0),
-    });
-    
+  const handleFoodLog = (entry: FoodLogEntry, summary: FitbitNutritionSummary) => {
+    addFoodLogEntry(entry, summary);
     setIsSearchOpen(false);
   };
 

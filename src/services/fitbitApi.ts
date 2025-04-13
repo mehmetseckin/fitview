@@ -1,4 +1,4 @@
-import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit, FoodLog, FitbitNutritionSummary, FrequentFood } from "@/types";
+import { FitbitFood, FoodSearchResult, FoodLogEntry, FitbitFoodUnit, FoodLog, FitbitNutritionSummary, FrequentFood, FitbitLogFoodResponse } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export class FitbitApiService {
@@ -33,14 +33,16 @@ export class FitbitApiService {
     return await this.fitbitApiRequest(`/foods/${foodId}.json`);
   }
 
-  public async logFood(foodEntry: Omit<FoodLogEntry, "logId" | "logDate">): Promise<FoodLogEntry> {
-    const data = await this.fitbitApiRequest(`/user/-/foods/log.json`, "POST", {
-      foodId: foodEntry.loggedFood.foodId,
-      mealTypeId: foodEntry.loggedFood.mealTypeId,
-      amount: foodEntry.loggedFood.amount,
-      unitId: foodEntry.loggedFood.unit.id,
+  public async logFood(foodEntry: Omit<FoodLogEntry, "logId" | "logDate">): Promise<FitbitLogFoodResponse> {
+    const { foodId, mealTypeId, unit, amount } = foodEntry.loggedFood;
+    const parameters = new URLSearchParams({
+      foodId: foodId.toString(),
+      mealTypeId: mealTypeId.toString(),
+      unitId: unit.id.toString(),
+      amount: amount.toString(),
+      date: (new Date()).toISOString().split("T")[0],
     });
-
+    const data = await this.fitbitApiRequest(`/user/-/foods/log.json?${parameters}`, "POST");
     return data;
   }
 

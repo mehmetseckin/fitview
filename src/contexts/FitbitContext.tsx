@@ -1,5 +1,5 @@
 import { useFitbitApi } from "@/hooks/useFitbitApi";
-import { FitbitFoodUnit, FoodLog, FoodLogEntry, FrequentFood } from "@/types";
+import { FitbitFoodUnit, FitbitNutritionSummary, FoodLog, FoodLogEntry, FrequentFood } from "@/types";
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext"; // Import AuthContext to check for user
 
@@ -7,7 +7,7 @@ type FitbitContextType = {
   units: FitbitFoodUnit[];
   foodLog: FoodLog;
   frequentFoods: FrequentFood[];
-  addFoodLogEntry: (entry: FoodLogEntry) => void;
+  addFoodLogEntry: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
 };
 
 const FitbitContext = createContext<FitbitContextType | undefined>(undefined);
@@ -74,10 +74,11 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
         .then(() => (isLoaded.current = true)); // Mark as loaded to prevent re-fetching
   }, [user?.id]);
 
-  const addFoodLogEntry = useCallback((entry: FoodLogEntry) => {
+  const addFoodLogEntry = useCallback((entry: FoodLogEntry, summary: FitbitNutritionSummary) => {
     setFoodLog((log) => ({
       ...log,
-      foods: [...log.foods, entry]
+      foods: [...log.foods, entry],
+      summary: summary
     }));
   }, []);
 
