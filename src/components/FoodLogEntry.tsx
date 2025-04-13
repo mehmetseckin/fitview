@@ -163,18 +163,20 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
                 <p className="font-medium">{calories.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground">calories</p>
               </div>
-              <div>
-                <p className="font-medium">{foodDetails.nutritionalValues?.carbs.toFixed(1)}g</p>
-                <p className="text-xs text-muted-foreground">carbs</p>
-              </div>
-              <div>
-                <p className="font-medium">{foodDetails.nutritionalValues?.fat.toFixed(1)}g</p>
-                <p className="text-xs text-muted-foreground">fat</p>
-              </div>
-              <div>
-                <p className="font-medium">{foodDetails.nutritionalValues?.protein.toFixed(1)}g</p>
-                <p className="text-xs text-muted-foreground">protein</p>
-              </div>
+              {foodDetails.nutritionalValues && (<>
+                <div>
+                  <p className="font-medium">{foodDetails.nutritionalValues.carbs.toFixed(1)}g</p>
+                  <p className="text-xs text-muted-foreground">carbs</p>
+                </div>
+                <div>
+                  <p className="font-medium">{foodDetails.nutritionalValues.fat.toFixed(1)}g</p>
+                  <p className="text-xs text-muted-foreground">fat</p>
+                </div>
+                <div>
+                  <p className="font-medium">{foodDetails.nutritionalValues.protein.toFixed(1)}g</p>
+                  <p className="text-xs text-muted-foreground">protein</p>
+                </div>
+              </>)}
             </div>
           </div>
           
