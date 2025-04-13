@@ -28,7 +28,7 @@ export const useFitbitApi = () => {
     return await fitbitApi.getFrequentFoods();
   };
 
-  const logFood = async (foodEntry: Omit<FoodLogEntry, "logId" | "logDate">) => {
+  const logFood = async (foodEntry: Omit<FoodLogEntry, "logDate">) => {
     return await fitbitApi.logFood(foodEntry);
   };
   

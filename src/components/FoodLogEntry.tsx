@@ -16,30 +16,35 @@ import { useFitbitApi } from "@/hooks/useFitbitApi";
 import { getFitbitMealName } from "@/lib/utils";
 
 interface FoodLogEntryProps {
+  foodLog?: FoodLogEntry;
   food: FitbitFood;
   onClose: () => void;
   onLog: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
 }
 
-const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
-  const [mealType, setMealType] = useState<MealType>(MealType.breakfast);
-  const [amount, setAmount] = useState(1);
-  const [unit, setUnit] = useState(food.defaultUnit);
+const FoodLogEntryForm = ({ foodLog, food, onClose, onLog }: FoodLogEntryProps) => {
+  const [mealType, setMealType] = useState<MealType>(foodLog?.loggedFood.mealTypeId || MealType.breakfast);
+  const [amount, setAmount] = useState(foodLog?.loggedFood.amount || food?.defaultServingSize || 1);
+  const [unit, setUnit] = useState(foodLog?.loggedFood.unit || food?.defaultUnit);
   const [isLogging, setIsLogging] = useState(false);
   const { toast } = useToast();
   const { getFoodDetails, logFood } = useFitbitApi();
   const [isDetailsLoaded, setIsDetailsLoaded] = useState(false);
   const [foodDetails, setFoodDetails] = useState<FitbitFood | null>(food);
-  const [calories, setCalories] = useState(food.calories);
+  const [calories, setCalories] = useState(foodLog?.loggedFood.calories || food?.calories);
 
   useEffect(() => {
     if(isDetailsLoaded)
       return;
 
-    getFoodDetails(food.foodId)
+    let foodId = foodLog?.loggedFood.foodId || food?.foodId;
+    if(!foodId)
+      return;
+
+    getFoodDetails(foodId)
       .then((data) => {
         setFoodDetails(data.food);
-        setUnit(data.food.defaultUnit)
+        setUnit(foodLog?.loggedFood.unit || data.food.defaultUnit)
         setIsDetailsLoaded(true);
       })
       .catch((error) => {
@@ -48,9 +53,12 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
   }, [isDetailsLoaded, food]);
   
   useEffect(() => {
+    if(!foodDetails)
+      return;
+
     let serving = foodDetails.servings?.find((s) => s.unit.id === unit.id);
     if (serving) {
-      setCalories(amount * serving.multiplier * food.calories);
+      setCalories((amount / serving.servingSize) * serving.multiplier * foodDetails.calories);
     }
   }, [amount, unit]);
 
@@ -66,8 +74,10 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
         });
         return;
       }
-      
+
+      const isUpdate = !!(foodLog?.logId);
       const response = await logFood({
+        logId: foodLog?.logId,
         loggedFood: {
           foodId: foodDetails.foodId,
           name: foodDetails.name,
@@ -81,10 +91,10 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
       
       toast({
         title: "Food logged successfully",
-        description: `Added ${foodDetails.name} to your ${getFitbitMealName(mealType)} log`,
+        description: `${isUpdate ? 'Updated' : 'Added'} ${foodDetails.name} ${isUpdate ? 'in' : 'to'} your ${getFitbitMealName(mealType)} log`,
       });
       
-      onLog(response.foodLog, response.foodDay.summary);
+      onLog(response.foodLog, response.foodDay?.summary);
     } catch (error) {
       console.error("Error logging food:", error);
       toast({
@@ -141,7 +151,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Meal</label>
-              <Select value={mealType.toString()} onValueChange={(value: any) => setMealType(value)}>
+              <Select value={mealType.toString()} onValueChange={(value: any) => setMealType(parseFloat(value))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

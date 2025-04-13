@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FoodSearch from "@/components/FoodSearch";
 import FoodLogEntryForm from "@/components/FoodLogEntry";
 import DailyGoals from "@/components/DailyGoals";
-import { FitbitFood, FoodLogEntry, MealType, FitbitNutritionGoals, FitbitNutritionSummary } from "@/types";
+import { FitbitFood, FoodLogEntry, MealType, FitbitNutritionGoals, FitbitNutritionSummary, FoodLog } from "@/types";
 import { format } from "date-fns";
 import { getFitbitMealName, getFitbitMealType } from "@/lib/utils";
 import { useFitbit } from "@/contexts/FitbitContext";
@@ -18,6 +18,7 @@ import QuickAddCard from "@/components/QuickAddCard";
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState<FitbitFood | null>(null);
+  const [selectedFoodLog, setSelectedFoodLog] = useState<FoodLogEntry | null>(null);
   
   const { foodLog, units, frequentFoods, addFoodLogEntry } = useFitbit();
 
@@ -102,7 +103,10 @@ const Index = () => {
                 </div>
                 <Dialog open={isSearchOpen || !!selectedFood} onOpenChange={(open) => { 
                   setIsSearchOpen(open); 
-                  setSelectedFood(open ? selectedFood : null); 
+                  if(!open) {
+                    setSelectedFood(null); 
+                    setSelectedFoodLog(null);
+                  }
                 }}>
                   <DialogTrigger asChild>
                     <Button className="bg-fitview-primary hover:bg-fitview-accent">
@@ -110,10 +114,14 @@ const Index = () => {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px]">
-                    {selectedFood ? (
-                      <FoodLogEntryForm 
+                    {(selectedFood || selectedFoodLog) ? (
+                      <FoodLogEntryForm
+                        foodLog={selectedFoodLog} 
                         food={selectedFood}
-                        onClose={() => setSelectedFood(null)} 
+                        onClose={() => {
+                          setSelectedFood(null);
+                          setSelectedFoodLog(null);
+                        }}
                         onLog={handleFoodLog}
                       />
                     ) : (
@@ -137,76 +145,54 @@ const Index = () => {
                     <TabsTrigger value="evening snack">Evening Snack</TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="all" className="space-y-4">
-                    {foodLog.foods.length > 0 ? (
-                      foodLog.foods.map((entry) => (
-                        <Card key={entry.logId}>
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <h3 className="font-medium">{entry.loggedFood.name}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  {entry.loggedFood.amount} {entry.loggedFood.amount !== 1 ? entry.loggedFood.unit.plural : entry.loggedFood.unit.name} • {getFitbitMealName(entry.loggedFood.mealTypeId)}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))
-                    ) : (
-                      <div className="text-center py-6">
-                        <p className="text-muted-foreground">No foods logged today</p>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setIsSearchOpen(true)}
-                          className="mt-2"
-                        >
-                          Log your first meal
-                        </Button>
-                      </div>
-                    )}
-                  </TabsContent>
-                  
                   {/* Similar TabsContent for breakfast, lunch, dinner, snack */}
-                  {["breakfast", "morning snack", "lunch", "afternoon snack", "dinner", "evening snack"].map((mealType) => (
-                    <TabsContent key={mealType} value={mealType} className="space-y-4">
-                      {foodLog.foods.filter(entry => entry.loggedFood.mealTypeId === getFitbitMealType(mealType)).length > 0 ? (
-                        foodLog.foods
-                          .filter(entry => entry.loggedFood.mealTypeId === getFitbitMealType(mealType))
-                          .map((entry) => (
-                            <Card key={entry.logId}>
-                              <CardContent className="p-4">
-                                <div className="flex justify-between items-center">
-                                  <div>
-                                    <h3 className="font-medium">{entry.loggedFood.name}</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                      {entry.loggedFood.amount} {entry.loggedFood.amount !== 1 ? entry.loggedFood.unit.plural : entry.loggedFood.unit.name} • {getFitbitMealName(entry.loggedFood.mealTypeId)}
-                                    </p>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))
-                      ) : (
-                        <div className="text-center py-6">
-                          <p className="text-muted-foreground">No {mealType} foods logged</p>
-                          <Button 
-                            variant="outline" 
-                            onClick={() => setIsSearchOpen(true)}
-                            className="mt-2"
-                          >
-                            Log {mealType}
-                          </Button>
-                        </div>
-                      )}
-                    </TabsContent>
-                  ))}
+                  {["all", "breakfast", "morning snack", "lunch", "afternoon snack", "dinner", "evening snack"].map((mealType) => { 
+                    const filteredFoods = foodLog.foods.filter(entry => mealType === "all" || entry.loggedFood.mealTypeId === getFitbitMealType(mealType));
+                    return (
+                        <TabsContent key={mealType} value={mealType} className="space-y-4">
+                          {filteredFoods.length > 0 ? 
+                          (
+                            filteredFoods
+                              .map((entry) => (
+                                <Card 
+                                  key={entry.logId} 
+                                  className="hover:bg-muted cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedFoodLog(entry);
+                                    setIsSearchOpen(true); 
+                                  }}>
+                                  <CardContent className="p-4">
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <h3 className="font-medium">{entry.loggedFood.name}</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                          {entry.loggedFood.amount} {entry.loggedFood.amount !== 1 ? entry.loggedFood.unit.plural : entry.loggedFood.unit.name} • {getFitbitMealName(entry.loggedFood.mealTypeId)}
+                                        </p>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-medium">{entry.nutritionalValues.calories.toFixed(0)} cal</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))
+                             ) : 
+                             (
+                              <div className="text-center py-6">
+                                <p className="text-muted-foreground">No {mealType === "all" ? " " : `${mealType} `}foods logged</p>
+                                <Button 
+                                  variant="outline" 
+                                  onClick={() => setIsSearchOpen(true)}
+                                  className="mt-2"
+                                >
+                                  Log {mealType}
+                                </Button>
+                              </div>
+                              )
+                          }
+                        </TabsContent>
+                      )
+                  })}
                 </Tabs>
               </CardContent>
             </Card>

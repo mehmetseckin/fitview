@@ -33,16 +33,23 @@ export class FitbitApiService {
     return await this.fitbitApiRequest(`/foods/${foodId}.json`);
   }
 
-  public async logFood(foodEntry: Omit<FoodLogEntry, "logId" | "logDate">): Promise<FitbitLogFoodResponse> {
-    const { foodId, mealTypeId, unit, amount } = foodEntry.loggedFood;
+  public async logFood(foodEntry: Omit<FoodLogEntry, "logDate">): Promise<FitbitLogFoodResponse> {
+    
+    const { logId, loggedFood } = foodEntry;
+    const { foodId, mealTypeId, unit, amount } = loggedFood;
+    const endpoint = !!logId ? `/user/-/foods/log/${logId}.json` : `/user/-/foods/log.json`;
     const parameters = new URLSearchParams({
       foodId: foodId.toString(),
       mealTypeId: mealTypeId.toString(),
       unitId: unit.id.toString(),
-      amount: amount.toString(),
-      date: (new Date()).toISOString(),
+      amount: amount.toString()
     });
-    const data = await this.fitbitApiRequest(`/user/-/foods/log.json?${parameters}`, "POST");
+
+    if(!!logId) {
+      parameters.append("date", (new Date()).toISOString());
+    }
+
+    const data = await this.fitbitApiRequest(`${endpoint}?${parameters}`, "POST");
     return data;
   }
 

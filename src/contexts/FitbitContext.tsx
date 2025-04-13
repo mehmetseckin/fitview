@@ -77,8 +77,8 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
   const addFoodLogEntry = useCallback((entry: FoodLogEntry, summary: FitbitNutritionSummary) => {
     setFoodLog((log) => ({
       ...log,
-      foods: [...log.foods, entry],
-      summary: summary
+      foods: [...log.foods.filter(f => f.logId !== entry.logId), entry],
+      summary: summary || log.summary
     }));
   }, []);
 

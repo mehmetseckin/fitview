@@ -1,4 +1,4 @@
-import { MealType } from "@/types"
+import { FitbitFood, LoggedFood, MealType } from "@/types"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
