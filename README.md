@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
+# FitView - Your Personal Fitbit Nutrition Dashboard
 
-## Project info
+FitView is a web application designed to provide a clear and insightful view of your daily nutrition intake logged via Fitbit.
 
-**URL**: https://lovable.dev/projects/2b55b7bd-c75e-4294-85d4-ff961cf40bcb
+## Motivation
 
-## How can I edit this code?
+With the discontinuation of the Fitbit web dashboard, there was a gap for users who preferred managing and viewing their nutrition data on a desktop browser rather than solely through the mobile app. FitView aims to fill that gap by offering a web-based interface to connect with your Fitbit account, log food entries, and visualize your nutritional progress.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+*   **Connect to Fitbit:** Securely link your Fitbit account to fetch your nutrition data.
+*   **Daily Nutrition Summary:** Visualize your consumed calories, protein, carbohydrates, and fat against your daily goals.
+*   **Macronutrient Breakdown:** See your macronutrient distribution in an easy-to-understand pie chart and progress bars.
+*   **Food Logging:** Search for foods using the Fitbit database and log them to your daily intake for specific meals.
+*   **Food Log Viewing:** See a detailed list of foods logged for the current day, filterable by meal type.
+*   **Goal Setting:** View and potentially edit your daily calorie and macronutrient goals (based on component structure).
+*   **Responsive Design:** Access your nutrition data on desktop or mobile devices.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2b55b7bd-c75e-4294-85d4-ff961cf40bcb) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+*   **Frontend:** React, TypeScript
+*   **Build Tool:** Vite
+*   **Styling:** Tailwind CSS
+*   **UI Components:** shadcn-ui
+*   **Charts:** Recharts
+*   **Backend (Functions):** Deno (for Supabase Edge Functions acting as a Fitbit proxy/auth handler)
+*   **Authentication/Database:** Supabase (for user management and Fitbit token storage)
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+To run FitView locally, follow these steps:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1.  **Clone the repository:**
+    ```sh
+    git clone <YOUR_GIT_URL>
+    cd fitview
+    ```
 
-Follow these steps:
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    # or
+    yarn install
+    ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3.  **Set up Environment Variables:**
+    *   This project likely requires Supabase and Fitbit API credentials. You'll need to set up a Supabase project and a Fitbit application.
+    *   Create a `.env` file in the root directory and potentially within the `supabase/functions` directories.
+    *   Populate the `.env` files with necessary variables like:
+        *   `VITE_SUPABASE_URL`
+        *   `VITE_SUPABASE_ANON_KEY`
+        *   `SUPABASE_URL` (for Edge Functions)
+        *   `SUPABASE_SERVICE_ROLE_KEY` (for Edge Functions)
+        *   `FITBIT_CLIENT_ID`
+        *   `FITBIT_CLIENT_SECRET`
+        *   `APP_URL` (Your local development URL, e.g., `http://localhost:8080`)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4.  **Set up Supabase:**
+    *   You may need to run database migrations or set up specific tables (`user_fitbit`, `auth_states`, `edge_function_cache`) as inferred from the function code.
+    *   Deploy the Edge Functions (`fitbit-auth`, `fitbit-proxy`) to your Supabase project.
 
-# Step 3: Install the necessary dependencies.
-npm i
+5.  **Run the development server:**
+    ```sh
+    npm run dev
+    # or
+    yarn dev
+    ```
+    This will start the Vite development server, typically available at `http://localhost:8080` (or the port configured in `vite.config.ts`).
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Contributing
 
-**Edit a file directly in GitHub**
+Contributions are welcome! If you'd like to improve FitView, please feel free to fork the repository, make your changes, and submit a pull request. You can also open an issue to report bugs or suggest features.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## License
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2b55b7bd-c75e-4294-85d4-ff961cf40bcb) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+(Specify License Information Here - e.g., MIT License. Consider adding the MIT license text if applicable).
