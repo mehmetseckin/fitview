@@ -39,6 +39,7 @@ const FoodLogEntryForm = ({ food, onClose, onLog }: FoodLogEntryProps) => {
     getFoodDetails(food.foodId)
       .then((data) => {
         setFoodDetails(data.food);
+        setUnit(data.food.defaultUnit)
         setIsDetailsLoaded(true);
       })
       .catch((error) => {
