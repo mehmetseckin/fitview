@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FitbitFood, FrequentFood } from "@/types";
+import { Button } from "./ui/button";
 
 type QuickAddCardProps = {
   frequentFoods: FrequentFood[];
@@ -75,20 +76,20 @@ const QuickAddCard = ({ frequentFoods, onFoodSelect }: QuickAddCardProps) => {
           ))}
         </div>
         <div className="flex justify-between mt-4">
-          <button
-            className="px-4 py-2 bg-gray-200 rounded"
+          <Button
+            className="bg-secondary"
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
           >
             Previous
-          </button>
-          <button
-            className="px-4 py-2 bg-gray-200 rounded"
+          </Button>
+          <Button
+            className="bg-secondary"
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
           >
             Next
-          </button>
+          </Button>
         </div>
       </CardContent>
     </Card>

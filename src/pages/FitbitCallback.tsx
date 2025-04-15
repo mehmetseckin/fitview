@@ -69,7 +69,7 @@ const FitbitCallback = () => {
   if (isLoading) {
     // Show a loading state while AuthContext is loading
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Loading...</h1>
           <p className="text-gray-600">Please wait while we load your account</p>
@@ -79,7 +79,7 @@ const FitbitCallback = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-4">
           {isProcessing ? "Connecting with Fitbit..." : "Finishing up..."}

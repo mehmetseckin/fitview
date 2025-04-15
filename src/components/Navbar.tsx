@@ -13,7 +13,7 @@ const Navbar = () => {
       <div className="flex h-16 items-center px-4 container">
         <div className="flex items-center gap-2">
           <img src={fitviewLogo} alt="" className="h-8 w-8" />
-          <Link to="/" className="font-bold text-xl text-fitview-primary">
+          <Link to="/" className="font-bold text-xl">
             FitView
           </Link>
         </div>

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCcw, Database } from "lucide-react"; 
+import { RefreshCcw, Database, Moon, Cog, Sun, Settings2, SettingsIcon } from "lucide-react"; 
 import fitbitAppIcon from '@/assets/images/fitbit-app-icon.png';
 
 const Settings = () => {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "checking">("checking");
   
@@ -100,7 +102,7 @@ const Settings = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
       <div className="container py-6">
@@ -163,28 +165,51 @@ const Settings = () => {
           </Card>
         </div>
         <div className="max-w-md mx-auto mt-6">
-        <Card>
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Database className="h-6 w-6 mr-2" /> 
-                Cache
-              </CardTitle>
+              <CardTitle>Theme</CardTitle>
               <CardDescription>
-                Manage cached data fetched from Fitbit to improve performance.
+                Choose your preferred appearance. Default is system setting.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">Cache management options coming soon.</p> 
+
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="system"
+                    checked={theme === "system"}
+                    onChange={() => setTheme("system")}
+                  />
+                  <SettingsIcon className="h-5 w-5 mr-2" />
+                  Use System Setting (Default)
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="light"
+                    checked={theme === "light"}
+                    onChange={() => setTheme("light")}
+                  />
+                  <Sun className="h-5 w-5 mr-2" />
+                  Light
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="dark"
+                    checked={theme === "dark"}
+                    onChange={() => setTheme("dark")}
+                  />
+                  <Moon className="h-5 w-5 mr-2" />
+                  Dark
+                </label>
+              </div>
             </CardContent>
-            <CardFooter>
-               <Button 
-                  variant="outline" 
-                  className="w-full" 
-                  disabled
-                >
-                  Clear Cache
-                </Button>
-            </CardFooter>
           </Card>
         </div>
       </div>

@@ -20,7 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-
+import fitviewLogo from "@/assets/images/fitview-symbol.png";
+ 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
@@ -134,13 +135,14 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50  dark:bg-gray-900 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
-          <Link to="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-fitview-primary">FitView</h1>
+          <Link to="/" className="flex justify-center">
+            <img src={fitviewLogo} alt="" className="h-8 w-8 mr-2 mt-1" />
+            <h1 className="text-3xl font-bold">FitView</h1>
           </Link>
-          <p className="text-gray-600">Track your nutrition and fitness journey</p>
+          <p className="dark:text-accent">Track your nutrition and fitness journey</p>
         </div>
         
         <Card>
@@ -151,7 +153,7 @@ const Auth = () => {
           <CardContent className="space-y-4">
             <Button 
               variant="outline" 
-              className="w-full flex items-center justify-center gap-2"
+              className="w-full flex items-center justify-center gap-2 dark:text-black dark:bg-primary dark:hover:bg-gray-50"
               onClick={handleGoogleSignIn}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512" className="h-4 w-4">
