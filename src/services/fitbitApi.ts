@@ -26,7 +26,7 @@ export class FitbitApiService {
   }
 
   public async searchFoods(query: string): Promise<FoodSearchResult> {
-    return await this.fitbitApiRequest(`/foods/search.json?query=${encodeURIComponent(query)}`);
+    return await this.fitbitApiRequest(`/foods/search.json?query=${encodeURIComponent(query?.toUpperCase())}`);
   }
 
   public async getFoodDetails(foodId: string): Promise<{ food: FitbitFood } | null> {
