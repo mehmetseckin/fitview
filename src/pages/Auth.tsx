@@ -76,7 +76,7 @@ const Auth = () => {
         description: "Welcome back to FitView!",
       });
       
-      navigate("/settings");
+      navigate("/");
     } catch (error) {
       toast({
         title: "An error occurred",
