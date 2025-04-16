@@ -29,12 +29,13 @@ import { getFitbitMealName } from "@/lib/utils";
 interface FoodLogEntryProps {
   foodLog?: FoodLogEntry;
   food: FitbitFood;
+  date: Date,
   onClose: () => void;
   onLog: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
   onDelete: (logId: string) => void;
 }
 
-const FoodLogEntryForm = ({ foodLog, food, onClose, onLog, onDelete }: FoodLogEntryProps) => {
+const FoodLogEntryForm = ({ foodLog, food, date, onClose, onLog, onDelete }: FoodLogEntryProps) => {
   const [mealType, setMealType] = useState<MealType>(foodLog?.loggedFood.mealTypeId || MealType.breakfast);
   const [amount, setAmount] = useState(foodLog?.loggedFood.amount || food?.defaultServingSize || 1);
   const [unit, setUnit] = useState(foodLog?.loggedFood.unit || food?.defaultUnit);
@@ -91,6 +92,7 @@ const FoodLogEntryForm = ({ foodLog, food, onClose, onLog, onDelete }: FoodLogEn
       const isUpdate = !!(foodLog?.logId);
       const response = await logFood({
         logId: foodLog?.logId,
+        logDate: isUpdate ? foodLog.logDate : date,
         loggedFood: {
           foodId: foodDetails.foodId,
           name: foodDetails.name,

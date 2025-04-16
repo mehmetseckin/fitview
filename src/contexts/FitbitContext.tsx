@@ -7,6 +7,8 @@ type FitbitContextType = {
   units: FitbitFoodUnit[];
   foodLog: FoodLog;
   frequentFoods: FrequentFood[];
+  date: Date,
+  setDate: (date: Date) => void;
   addFoodLogEntry: (entry: FoodLogEntry, summary: FitbitNutritionSummary) => void;
   deleteFoodLogEntry: (logId: string) => void;
 };
@@ -15,6 +17,7 @@ const FitbitContext = createContext<FitbitContextType | undefined>(undefined);
 
 export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
   const [units, setUnits] = useState<FitbitFoodUnit[]>([]);
+  const [date, setDate] = useState<Date>(new Date());
   const [foodLog, setFoodLog] = useState<FoodLog>({
     foods: [],
     summary: {
@@ -36,13 +39,12 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
     }
   });
   const [frequentFoods, setFrequentFoods] = useState<FrequentFood[]>([]); // State to store frequent food
-  const isLoaded = useRef(false); // Track if food units are loaded
   const { user } = useAuth(); // Get user and loading state from AuthContext
   const { getFoodUnits, getFoodLog, getFrequentFoods } = useFitbitApi();
 
   useEffect(() => {
     // Wait until the AuthContext has finished loading and the user is available
-    if (!user || isLoaded.current) {
+    if (!user) {
       return;
     }
 
@@ -55,7 +57,7 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Error fetching food units:", error);
       });
 
-      const foodLogPromise = getFoodLog()
+      const foodLogPromise = getFoodLog(date)
       .then((data) => {
         setFoodLog(data);
       })
@@ -71,9 +73,8 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Error fetching food log:", error);
       });
       
-      Promise.all([unitsPromise, foodLogPromise, frequentFoodsPromise])
-        .then(() => (isLoaded.current = true)); // Mark as loaded to prevent re-fetching
-  }, [user?.id]);
+      Promise.all([unitsPromise, foodLogPromise, frequentFoodsPromise]);
+  }, [user?.id, date]);
 
   const addFoodLogEntry = useCallback((entry: FoodLogEntry, summary: FitbitNutritionSummary) => {
     setFoodLog((log) => ({
@@ -91,12 +92,14 @@ export const FitbitProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const value = useMemo(() => ({ 
-    units, 
+    units,
+    date,
     foodLog, 
     frequentFoods, 
     addFoodLogEntry,
-    deleteFoodLogEntry
-  }), [units, foodLog, frequentFoods, addFoodLogEntry, deleteFoodLogEntry]);
+    deleteFoodLogEntry,
+    setDate
+  }), [units, date, foodLog, frequentFoods, addFoodLogEntry, deleteFoodLogEntry, setDate]);
 
   return (
     <FitbitContext.Provider value={value}>

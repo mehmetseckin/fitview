@@ -11,16 +11,17 @@ import { FitbitFood, FoodLogEntry, MealType, FitbitNutritionGoals, FitbitNutriti
 import { format } from "date-fns";
 import { getFitbitMealName, getFitbitMealType } from "@/lib/utils";
 import { useFitbit } from "@/contexts/FitbitContext";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import NutritionSummary from "@/components/NutritionSummary";
 import QuickAddCard from "@/components/QuickAddCard";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState<FitbitFood | null>(null);
   const [selectedFoodLog, setSelectedFoodLog] = useState<FoodLogEntry | null>(null);
-  
-  const { foodLog, units, frequentFoods, addFoodLogEntry, deleteFoodLogEntry } = useFitbit();
+  const { foodLog, units, date, setDate, frequentFoods, addFoodLogEntry, deleteFoodLogEntry } = useFitbit();
 
   const [nutritionGoals, setNutritionGoals] = useState<FitbitNutritionGoals>({
     calories: 0,
@@ -66,11 +67,10 @@ const Index = () => {
       <Navbar />
       
       <div className="container py-6">
-        <h1 className="text-3xl font-bold mb-6">FitView Dashboard</h1>
-        
         <div className="grid gap-6 md:grid-cols-6">
           {/* Main content area - 4 columns on medium+ screens */}
           <div className="md:col-span-4 space-y-6">
+            <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
             <Card>
               <CardHeader>
                 <CardTitle>Nutrition Overview</CardTitle>
@@ -123,6 +123,7 @@ const Index = () => {
                       <FoodLogEntryForm
                         foodLog={selectedFoodLog} 
                         food={selectedFood}
+                        date={date}
                         onClose={() => {
                           setSelectedFood(null);
                           setSelectedFoodLog(null);
@@ -206,6 +207,47 @@ const Index = () => {
           
           {/* Sidebar - 2 columns on medium+ screens */}
           <div className="md:col-span-2 space-y-6">
+            <div className={"flex flex-row"}>
+
+              <Button
+                variant={"outline"}
+                className={"w-10 ml-1"}
+                onClick={() => {setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000))}}
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={"mx-1 justify-start text-left font-normal"}
+                  >
+                    <CalendarIcon className="mr-1 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(day) => {
+                      setDate(day);
+                    }}
+                    toDate={new Date()}
+                    required
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <Button
+                variant={"outline"}
+                className={"w-10 mr-1"}
+                onClick={() => {setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000))}}
+                disabled={date.toDateString() === (new Date()).toDateString()}
+              >
+                <ChevronRightIcon className="h-4 w-4" />
+              </Button>
+            </div>
             <DailyGoals 
               goals={nutritionGoals} 
               onSave={setNutritionGoals} 
