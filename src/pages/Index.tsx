@@ -44,8 +44,10 @@ const Index = () => {
   });
 
   useEffect(() => {
-    setNutritionGoals(foodLog.goals);
-    setSummaryData(foodLog.summary);
+    if(foodLog.goals)
+      setNutritionGoals(foodLog.goals);
+    if(foodLog.summary)
+      setSummaryData(foodLog.summary);
   }, [foodLog])
 
   const handleFoodSelect = (food: FitbitFood) => {
