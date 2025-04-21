@@ -1,6 +1,8 @@
 # FitView - Your Personal Fitbit Nutrition Dashboard
 
-FitView is a web application designed to provide a clear and insightful view of your daily nutrition intake logged via Fitbit.
+![FitView Logo](src/assets/images/fitview-logo.png)
+
+[FitView](https://fitview.mehmetseckin.com) is a web application designed to provide a clear and insightful view of your daily nutrition intake logged via Fitbit.
 
 ## Motivation
 
@@ -14,7 +16,6 @@ With the discontinuation of the Fitbit web dashboard, there was a gap for users 
 *   **Food Logging:** Search for foods using the Fitbit database and log them to your daily intake for specific meals.
 *   **Food Log Viewing:** See a detailed list of foods logged for the current day, filterable by meal type.
 *   **Goal Setting:** View and potentially edit your daily calorie and macronutrient goals (based on component structure).
-*   **Responsive Design:** Access your nutrition data on desktop or mobile devices.
 
 ## Tech Stack
 
@@ -44,7 +45,7 @@ To run FitView locally, follow these steps:
     ```
 
 3.  **Set up Environment Variables:**
-    *   This project likely requires Supabase and Fitbit API credentials. You'll need to set up a Supabase project and a Fitbit application.
+    *   This project requires Supabase and Fitbit API credentials. You'll need to set up a Supabase project and a Fitbit application.
     *   Create a `.env` file in the root directory and potentially within the `supabase/functions` directories.
     *   Populate the `.env` files with necessary variables like:
         *   `VITE_SUPABASE_URL`
@@ -56,8 +57,10 @@ To run FitView locally, follow these steps:
         *   `APP_URL` (Your local development URL, e.g., `http://localhost:8080`)
 
 4.  **Set up Supabase:**
-    *   You may need to run database migrations or set up specific tables (`user_fitbit`, `auth_states`, `edge_function_cache`) as inferred from the function code.
-    *   Deploy the Edge Functions (`fitbit-auth`, `fitbit-proxy`) to your Supabase project.
+    *   Ensure you have the [Supabase CLI](https://supabase.com/docs/guides/cli) installed and you are logged in (`supabase login`).
+    *   Link your local project to your Supabase project: `supabase link --project-ref <YOUR_PROJECT_ID>` (Replace `<YOUR_PROJECT_ID>` with your actual Supabase project ID).
+    *   Push the database schema: `supabase db push`. This will apply the migrations located in the `supabase/migrations` directory.
+    *   Deploy the Edge Functions: `supabase functions deploy fitbit-auth --no-verify-jwt` and `supabase functions deploy fitbit-proxy --no-verify-jwt`.
 
 5.  **Run the development server:**
     ```sh
@@ -73,4 +76,4 @@ Contributions are welcome! If you'd like to improve FitView, please feel free to
 
 ## License
 
-(Specify License Information Here - e.g., MIT License. Consider adding the MIT license text if applicable).
+This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
